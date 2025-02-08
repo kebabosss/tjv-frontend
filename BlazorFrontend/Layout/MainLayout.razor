@@ -1,0 +1,62 @@
+﻿@using Blazored.LocalStorage
+@using MudBlazor
+@inherits LayoutComponentBase
+@inject ILocalStorageService LocalStorage
+@inject NavigationManager NavigationManager
+
+<MudThemeProvider @ref="@_mudThemeProvider" Theme="MyCustomTheme"/>
+<MudPopoverProvider/>
+<MudDialogProvider/>
+<MudSnackbarProvider/>
+
+        <MudLayout>
+            <MudAppBar Elevation="1" Dense="true">
+                <MudText Typo="Typo.h5" Class="ml-3">Vítejte ve filmové databázi</MudText>
+                <MudSpacer/>
+            </MudAppBar>
+            <MudMainContent>
+                @Body
+            </MudMainContent>
+        </MudLayout>
+ 
+        <MudLayout>
+            <MudAppBar Elevation="1" Dense="true">
+                <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@(e => DrawerToggle())"/>
+                <MudText Typo="Typo.h5" Class="ml-3">ESSL</MudText>
+                <MudSpacer/>
+            </MudAppBar>
+            <MudDrawer @bind-Open="@_drawerOpen" ClipMode="@DrawerClipMode.Always" Breakpoint="@Breakpoint.Lg" Elevation="1" Variant="@DrawerVariant.Mini">
+                <MudNavMenu>
+                    <NavMenu/>
+                </MudNavMenu>
+            </MudDrawer>
+            <MudMainContent>
+                @Body
+            </MudMainContent>
+        </MudLayout>
+
+@code {
+
+    /// <summary>
+    ///  Custom theme for the application
+    /// </summary>
+    public MudTheme MyCustomTheme = new MudTheme {
+        PaletteLight = new PaletteLight() {
+            AppbarBackground = "#046477",
+            Primary = "#1aa59c",
+            Secondary = "#1fd8af",
+            DrawerBackground = "#f8f8f8",
+            Background = "#fdfdfd"
+        }
+    };
+
+ 
+
+    private MudThemeProvider _mudThemeProvider;
+
+    bool _drawerOpen;
+
+    void DrawerToggle() {
+        _drawerOpen = !_drawerOpen;
+    }
+}

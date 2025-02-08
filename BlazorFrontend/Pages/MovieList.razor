@@ -1,0 +1,97 @@
+﻿@page "/movieList"
+@using BlazorFrontend.DTO
+@using MudBlazor
+@inject HttpClient Http
+@inject NavigationManager Navigation
+
+
+
+<MudContainer MaxWidth="MaxWidth.Large" Style="position: relative; padding-bottom: 5%; padding-top: 3%; min-height: 300px">
+    <MudContainer MaxWidth="MaxWidth.Large" Style="position: relative; padding: 0 0 3% 0;">
+        <MudStack Row="true">
+            <MudButton OnClick="@AddItem" Color="@Color.Default" Variant="Variant.Outlined" Size="Size.Large" Class="add-item-btn">Přidat</MudButton>
+        </MudStack>
+    </MudContainer>
+    <MudDataGrid T="MovieDTO" MultiSelection="false" Items="@_data" SortMode="SortMode.Multiple" Filterable="false" QuickFilter="@QuickFilter"
+                 Hideable="false" Hover="false" Dense="@_shouldBeDense" Striped="true" ShowColumnOptions="false" Loading="@_loading">
+        <ToolBarContent>
+            <MudText Typo="Typo.h6">Filmy</MudText>
+            <MudSpacer/>
+            <MudTextField @bind-Value="_searchString" Placeholder="Vyhledat" Adornment="Adornment.Start" Immediate="true"
+                          AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0">
+            </MudTextField>
+        </ToolBarContent>
+        <Columns>
+            <PropertyColumn Property="x => x.id" Title="Id" Sortable="true" InitialDirection="SortDirection.Ascending"/>
+            <PropertyColumn Property="x => x.name" Title="Název"/>
+            <PropertyColumn Property="x => x.releaseYear" Title="Rok vydání"/>
+            <PropertyColumn Property="x => x.reviews.Count" Title="Počet recenzí"/>
+            <TemplateColumn CellClass="justify-center" Title="Zobrazit">
+                <CellTemplate>
+                    <MudIconButton Icon="@Icons.Material.Outlined.RemoveRedEye" Color="Color.Info" Size="Size.Small" OnClick="() => ViewDetail(context.Item)"></MudIconButton>
+                </CellTemplate>
+            </TemplateColumn>
+
+
+        </Columns>
+        <PagerContent>
+            <MudDataGridPager T="MovieDTO" RowsPerPageString="Položek na stránku: "/>
+        </PagerContent>
+    </MudDataGrid>
+</MudContainer>
+
+@code {
+
+    private List<MovieDTO> _data;
+private bool _loading = true;
+private bool _shouldBeDense;
+private string? _searchString;
+
+
+
+/// <summary>
+/// Initializes the component.
+/// </summary>
+protected override async Task OnInitializedAsync() {
+    await base.OnInitializedAsync();
+    await RefreshList();
+    _loading = false;
+}
+	
+private async Task RefreshList() {
+    _loading = true;
+    var result = await Http.GetFromJsonAsync<List<MovieDTO>>("rest/movie");
+    if (result == null) {
+        _loading = false;
+        return;
+    }
+
+    _data = result;
+    _shouldBeDense = _data.Count() > 5;
+    _loading = false;
+    StateHasChanged();
+}
+
+private void AddItem() {
+    Navigation.NavigateTo("/useradd");
+}
+	
+private void ViewDetail(MovieDTO context) {
+    Navigation.NavigateTo($"/movieDetail/{context.id}");
+}
+	
+private Func<MovieDTO, bool> QuickFilter => x => {
+   
+    if (string.IsNullOrWhiteSpace(_searchString))
+        return true;
+
+    if ($"{x.name}".Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+        return true;
+
+    if ($"{x.releaseYear} {x.id} ".Contains(_searchString))
+        return true;
+
+    return false;
+};
+
+}
