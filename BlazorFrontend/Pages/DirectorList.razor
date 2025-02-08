@@ -1,4 +1,4 @@
-﻿@page "/movieList"
+﻿@page "/DirectorList"
 @using BlazorFrontend.DTO
 @using MudBlazor
 @inject HttpClient Http
@@ -11,10 +11,10 @@
             <MudButton OnClick="@AddItem" Color="@Color.Default" Variant="Variant.Outlined" Size="Size.Large" Class="add-item-btn">Přidat</MudButton>
         </MudStack>
     </MudContainer>
-    <MudDataGrid T="MovieDTO" MultiSelection="false" Items="@_data" SortMode="SortMode.Multiple" Filterable="false" QuickFilter="@QuickFilter"
+    <MudDataGrid T="DirectorDTO" MultiSelection="false" Items="@_data" SortMode="SortMode.Multiple" Filterable="false" QuickFilter="@QuickFilter"
                  Hideable="false" Hover="false" Dense="@_shouldBeDense" Striped="true" ShowColumnOptions="false" Loading="@_loading">
         <ToolBarContent>
-            <MudText Typo="Typo.h6">Filmy</MudText>
+            <MudText Typo="Typo.h6">Režiséři</MudText>
             <MudSpacer/>
             <MudTextField @bind-Value="_searchString" Placeholder="Vyhledat" Adornment="Adornment.Start" Immediate="true"
                           AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0">
@@ -22,9 +22,8 @@
         </ToolBarContent>
         <Columns>
             <PropertyColumn Property="x => x.id" Title="Id" Sortable="true" InitialDirection="SortDirection.Ascending"/>
-            <PropertyColumn Property="x => x.name" Title="Název"/>
-            <PropertyColumn Property="x => x.releaseYear" Title="Rok vydání"/>
-            <PropertyColumn Property="x => x.reviews.Count" Title="Počet recenzí"/>
+            <PropertyColumn Property="x => x.name" Title="Jméno"/>
+            <PropertyColumn Property="x => x.yearOfBirth" Title="Rok narození"/>
             <TemplateColumn CellClass="justify-center" Title="Zobrazit">
                 <CellTemplate>
                     <MudIconButton Icon="@Icons.Material.Outlined.RemoveRedEye" Color="Color.Info" Size="Size.Small" OnClick="() => ViewDetail(context.Item)"></MudIconButton>
@@ -34,14 +33,14 @@
 
         </Columns>
         <PagerContent>
-            <MudDataGridPager T="MovieDTO" RowsPerPageString="Položek na stránku: "/>
+            <MudDataGridPager T="DirectorDTO" RowsPerPageString="Položek na stránku: "/>
         </PagerContent>
     </MudDataGrid>
 </MudContainer>
 
 @code {
 
-    private List<MovieDTO> _data;
+    private List<DirectorDTO> _data;
     private bool _loading = true;
     private bool _shouldBeDense;
     private string? _searchString;
@@ -60,7 +59,7 @@
     private async Task RefreshList()
     {
         _loading = true;
-        var result = await Http.GetFromJsonAsync<List<MovieDTO>>("rest/movie");
+        var result = await Http.GetFromJsonAsync<List<DirectorDTO>>("rest/director");
         if (result == null)
         {
             _loading = false;
@@ -75,15 +74,15 @@
 
     private void AddItem()
     {
-        Navigation.NavigateTo("/movieAdd");
+        Navigation.NavigateTo("/directorAdd");
     }
 
-    private void ViewDetail(MovieDTO context)
+    private void ViewDetail(DirectorDTO context)
     {
-        Navigation.NavigateTo($"/movieDetail/{context.id}");
+        Navigation.NavigateTo($"/direcorDetail/{context.id}");
     }
 
-    private Func<MovieDTO, bool> QuickFilter => x =>
+    private Func<DirectorDTO, bool> QuickFilter => x =>
     {
         if (string.IsNullOrWhiteSpace(_searchString))
             return true;
@@ -91,7 +90,7 @@
         if ($"{x.name}".Contains(_searchString, StringComparison.OrdinalIgnoreCase))
             return true;
 
-        if ($"{x.releaseYear} {x.id} ".Contains(_searchString))
+        if ($"{x.yearOfBirth} {x.id} ".Contains(_searchString))
             return true;
 
         return false;

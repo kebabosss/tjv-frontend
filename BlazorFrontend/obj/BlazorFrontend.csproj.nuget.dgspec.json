@@ -55,6 +55,10 @@
               "target": "Package",
               "version": "[4.5.0, )"
             },
+            "CodeBeam.MudBlazor.Extensions": {
+              "target": "Package",
+              "version": "[7.0.2, )"
+            },
             "Microsoft.AspNetCore.Components.WebAssembly": {
               "target": "Package",
               "version": "[8.0.4, )"

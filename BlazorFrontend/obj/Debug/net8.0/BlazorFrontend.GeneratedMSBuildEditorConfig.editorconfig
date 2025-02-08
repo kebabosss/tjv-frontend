@@ -37,20 +37,24 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = TGF5b3V0XE5hdk1lbnUucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/42060/semestral-client-blazor/BlazorFrontend/Pages/Counter.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ291bnRlci5yYXpvcg==
+[C:/Users/42060/semestral-client-blazor/BlazorFrontend/Pages/Dialog.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGlhbG9nLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/42060/semestral-client-blazor/BlazorFrontend/Pages/DirectorList.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGlyZWN0b3JMaXN0LnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/42060/semestral-client-blazor/BlazorFrontend/Pages/Home.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSG9tZS5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/42060/semestral-client-blazor/BlazorFrontend/Pages/MovieList.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTW92aWVMaXN0LnJhem9y
+[C:/Users/42060/semestral-client-blazor/BlazorFrontend/Pages/MovieDetail.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTW92aWVEZXRhaWwucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/42060/semestral-client-blazor/BlazorFrontend/Pages/Weather.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXNcV2VhdGhlci5yYXpvcg==
+[C:/Users/42060/semestral-client-blazor/BlazorFrontend/Pages/MovieList.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTW92aWVMaXN0LnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/42060/semestral-client-blazor/BlazorFrontend/_Imports.razor]

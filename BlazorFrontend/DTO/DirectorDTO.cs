@@ -2,10 +2,10 @@
 
 public class DirectorDTO
 {
-        public long id;
-        public List<long> moviesDirected;
-        public String name;
-        public int yearOfBirth;
+        public long id{ get; set; }
+        public List<long> moviesDirected { get; set; } = new();
+        public String name{ get; set; }
+        public int yearOfBirth{ get; set; }
 
         public DirectorDTO()
         {

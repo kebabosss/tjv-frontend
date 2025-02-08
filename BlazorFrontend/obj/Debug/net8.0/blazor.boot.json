@@ -1,7 +1,7 @@
 {
   "mainAssemblyName": "BlazorFrontend",
   "resources": {
-    "hash": "sha256-neVuLAtK4fnvg3/IU3aLRFudLGzshaxMRVSB0NX1R5w=",
+    "hash": "sha256-SEh6fjQ71vIGlJEnr7zjyr1pbXKb2xdLlbLaaEp+VoQ=",
     "jsModuleNative": {
       "dotnet.native.8.0.12.hqjokfk1uf.js": "sha256-B6DNRvFeCUi3jbx9uKpuj+hV9cN0KG4RdZj1FgBZwj8="
     },
@@ -18,6 +18,8 @@
     },
     "assembly": {
       "Blazored.LocalStorage.wasm": "sha256-OaMAAd5n7ORfyur5e3QIyEVKJ76MKIvwbg7/icnnYcU=",
+      "CodeBeam.MudBlazor.Extensions.wasm": "sha256-fRpFSGLOossyYIytJRo3ZrX3ODtlc2wunjku7OJrxF0=",
+      "CsvHelper.wasm": "sha256-C+c9R05nmsSkIe8W7X3Zm/Yxg23hvBLxDZAKLIzBRlY=",
       "Microsoft.AspNetCore.Authorization.wasm": "sha256-MU7sWxRNN2saeKjeKjEzOcHScadiqpZSFHmm9pRAgXQ=",
       "Microsoft.AspNetCore.Components.wasm": "sha256-b7K6lrR2/olkwgWg5icEuBtqoA6oubYSYBPNUi1p0x0=",
       "Microsoft.AspNetCore.Components.Forms.wasm": "sha256-Go1+KknLmUt4Al9mE6Zub4w1Ep6UQ8eoUZFkOqflpTk=",
@@ -45,6 +47,7 @@
       "MudBlazor.wasm": "sha256-rTKwfaiP1t2JBqhYcfSh14e+E2yGopnU6P3dN4McHdE=",
       "MudBlazor.ThemeManager.wasm": "sha256-igTMIQljHp8TvGyNv0gZffSHdXrLzrIvtpZIgCLCkAg=",
       "System.IO.Pipelines.wasm": "sha256-JqVBy6SV+3qk+IK3VJiyIDt9CsVk6b1/ytTXmrI4mTM=",
+      "zxing.wasm": "sha256-tMfd0yYIsmnNL+xt9XPz0JttM4ydnaDExf6FoFjM0Kg=",
       "Microsoft.CSharp.wasm": "sha256-zohYihZLqZl3Vs/WUXlbmBw6sSRhBg6suf/7sRlQmto=",
       "Microsoft.VisualBasic.Core.wasm": "sha256-MXkT7wYyI3D507DKaCtbF1jAArGlavK3uKcKTAI66GE=",
       "Microsoft.VisualBasic.wasm": "sha256-BZh7DOMoFCUxyPq+81J++Fra96nIXatJZ9Ft3DT49kw=",
@@ -213,10 +216,10 @@
       "mscorlib.wasm": "sha256-QoC5hTKpDNO6efLnEvYwV9OJBXvYRq8/1yGhNZKiNCw=",
       "netstandard.wasm": "sha256-JT2F4bYWJpaSGq+iD0ITLpWxsDhMUjhqje9RpBtTg7w=",
       "System.Private.CoreLib.wasm": "sha256-fvIPBcvgvsRuWrKi2LGQsLYvcKUSnyIuBUsE3LJu/0Y=",
-      "BlazorFrontend.wasm": "sha256-HeXoR6Mi+jY4nrV4nJ2SCvWvHIZwW65mWwvG2sbXRFE="
+      "BlazorFrontend.wasm": "sha256-V8Nt4gTjbSIFgkm2dm6wqc1utQsll/ri5OEAtI8dKec="
     },
     "pdb": {
-      "BlazorFrontend.pdb": "sha256-YvqjQjShikM974A12u7gMTyXThtwkN12S8t79NP+EtU="
+      "BlazorFrontend.pdb": "sha256-bTfPj0f/RWETHlESvcHC8dM/qyREiAEcHTnLXo8ol4k="
     }
   },
   "cacheBootResources": true,

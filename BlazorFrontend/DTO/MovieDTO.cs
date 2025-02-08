@@ -2,12 +2,12 @@
 
 public class MovieDTO
 {
-    public long id;
-    public String name;
-    public int releaseYear;
+    public long id { get; set; }
+    public String name{ get; set; }
+    public int releaseYear{ get; set; }
 
-    public List<long> directors;
-    public List<long> reviews;
+    public List<long> directors { get; set; } = new();
+    public List<long> reviews { get; set; } = new();
 
     public MovieDTO()
     {

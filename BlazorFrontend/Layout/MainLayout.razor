@@ -11,18 +11,8 @@
 
         <MudLayout>
             <MudAppBar Elevation="1" Dense="true">
-                <MudText Typo="Typo.h5" Class="ml-3">Vítejte ve filmové databázi</MudText>
-                <MudSpacer/>
-            </MudAppBar>
-            <MudMainContent>
-                @Body
-            </MudMainContent>
-        </MudLayout>
- 
-        <MudLayout>
-            <MudAppBar Elevation="1" Dense="true">
                 <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@(e => DrawerToggle())"/>
-                <MudText Typo="Typo.h5" Class="ml-3">ESSL</MudText>
+                <MudText Typo="Typo.h5" Class="ml-3">Filmová databáze</MudText>
                 <MudSpacer/>
             </MudAppBar>
             <MudDrawer @bind-Open="@_drawerOpen" ClipMode="@DrawerClipMode.Always" Breakpoint="@Breakpoint.Lg" Elevation="1" Variant="@DrawerVariant.Mini">

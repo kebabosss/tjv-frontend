@@ -1,10 +1,13 @@
 {
   "version": 2,
-  "dgSpecHash": "kJX/at85izU=",
+  "dgSpecHash": "VMz+b8dLsOI=",
   "success": true,
   "projectFilePath": "C:\\Users\\42060\\semestral-client-blazor\\BlazorFrontend\\BlazorFrontend.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\42060\\.nuget\\packages\\blazored.localstorage\\4.5.0\\blazored.localstorage.4.5.0.nupkg.sha512",
+    "C:\\Users\\42060\\.nuget\\packages\\buildbundlerminifier\\3.2.449\\buildbundlerminifier.3.2.449.nupkg.sha512",
+    "C:\\Users\\42060\\.nuget\\packages\\codebeam.mudblazor.extensions\\7.0.2\\codebeam.mudblazor.extensions.7.0.2.nupkg.sha512",
+    "C:\\Users\\42060\\.nuget\\packages\\csvhelper\\31.0.3\\csvhelper.31.0.3.nupkg.sha512",
     "C:\\Users\\42060\\.nuget\\packages\\microsoft.aspnetcore.authorization\\8.0.12\\microsoft.aspnetcore.authorization.8.0.12.nupkg.sha512",
     "C:\\Users\\42060\\.nuget\\packages\\microsoft.aspnetcore.components\\8.0.12\\microsoft.aspnetcore.components.8.0.12.nupkg.sha512",
     "C:\\Users\\42060\\.nuget\\packages\\microsoft.aspnetcore.components.analyzers\\8.0.12\\microsoft.aspnetcore.components.analyzers.8.0.12.nupkg.sha512",
@@ -37,7 +40,8 @@
     "C:\\Users\\42060\\.nuget\\packages\\mudblazor.thememanager\\3.0.0\\mudblazor.thememanager.3.0.0.nupkg.sha512",
     "C:\\Users\\42060\\.nuget\\packages\\system.io.pipelines\\8.0.0\\system.io.pipelines.8.0.0.nupkg.sha512",
     "C:\\Users\\42060\\.nuget\\packages\\system.text.encodings.web\\8.0.0\\system.text.encodings.web.8.0.0.nupkg.sha512",
-    "C:\\Users\\42060\\.nuget\\packages\\system.text.json\\8.0.0\\system.text.json.8.0.0.nupkg.sha512"
+    "C:\\Users\\42060\\.nuget\\packages\\system.text.json\\8.0.0\\system.text.json.8.0.0.nupkg.sha512",
+    "C:\\Users\\42060\\.nuget\\packages\\zxing.net\\0.16.9\\zxing.net.0.16.9.nupkg.sha512"
   ],
   "logs": []
 }

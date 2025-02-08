@@ -1,8 +1,16 @@
+C:\Users\42060\semestral-client-blazor\BlazorFrontend\obj\Debug\net8.0\BlazorFrontend.csproj.AssemblyReference.cache
+C:\Users\42060\semestral-client-blazor\BlazorFrontend\obj\Debug\net8.0\BlazorFrontend.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\42060\semestral-client-blazor\BlazorFrontend\obj\Debug\net8.0\BlazorFrontend.AssemblyInfoInputs.cache
+C:\Users\42060\semestral-client-blazor\BlazorFrontend\obj\Debug\net8.0\BlazorFrontend.AssemblyInfo.cs
+C:\Users\42060\semestral-client-blazor\BlazorFrontend\obj\Debug\net8.0\BlazorFrontend.csproj.CoreCompileInputs.cache
+C:\Users\42060\semestral-client-blazor\BlazorFrontend\obj\Debug\net8.0\BlazorFrontend.MvcApplicationPartsAssemblyInfo.cache
 C:\Users\42060\semestral-client-blazor\BlazorFrontend\bin\Debug\net8.0\wwwroot\_framework\blazor.boot.json
 C:\Users\42060\semestral-client-blazor\BlazorFrontend\bin\Debug\net8.0\wwwroot\_framework\blazor.webassembly.js
 C:\Users\42060\semestral-client-blazor\BlazorFrontend\bin\Debug\net8.0\wwwroot\_framework\Blazored.LocalStorage.wasm
 C:\Users\42060\semestral-client-blazor\BlazorFrontend\bin\Debug\net8.0\wwwroot\_framework\BlazorFrontend.pdb
 C:\Users\42060\semestral-client-blazor\BlazorFrontend\bin\Debug\net8.0\wwwroot\_framework\BlazorFrontend.wasm
+C:\Users\42060\semestral-client-blazor\BlazorFrontend\bin\Debug\net8.0\wwwroot\_framework\CodeBeam.MudBlazor.Extensions.wasm
+C:\Users\42060\semestral-client-blazor\BlazorFrontend\bin\Debug\net8.0\wwwroot\_framework\CsvHelper.wasm
 C:\Users\42060\semestral-client-blazor\BlazorFrontend\bin\Debug\net8.0\wwwroot\_framework\dotnet.js
 C:\Users\42060\semestral-client-blazor\BlazorFrontend\bin\Debug\net8.0\wwwroot\_framework\dotnet.js.map
 C:\Users\42060\semestral-client-blazor\BlazorFrontend\bin\Debug\net8.0\wwwroot\_framework\dotnet.native.8.0.12.hqjokfk1uf.js
@@ -207,6 +215,7 @@ C:\Users\42060\semestral-client-blazor\BlazorFrontend\bin\Debug\net8.0\wwwroot\_
 C:\Users\42060\semestral-client-blazor\BlazorFrontend\bin\Debug\net8.0\wwwroot\_framework\System.Xml.XPath.wasm
 C:\Users\42060\semestral-client-blazor\BlazorFrontend\bin\Debug\net8.0\wwwroot\_framework\System.Xml.XPath.XDocument.wasm
 C:\Users\42060\semestral-client-blazor\BlazorFrontend\bin\Debug\net8.0\wwwroot\_framework\WindowsBase.wasm
+C:\Users\42060\semestral-client-blazor\BlazorFrontend\bin\Debug\net8.0\wwwroot\_framework\zxing.wasm
 C:\Users\42060\semestral-client-blazor\BlazorFrontend\bin\Debug\net8.0\wwwroot\_framework\System.Linq.wasm.gz
 C:\Users\42060\semestral-client-blazor\BlazorFrontend\bin\Debug\net8.0\wwwroot\_framework\System.Net.Http.wasm.gz
 C:\Users\42060\semestral-client-blazor\BlazorFrontend\bin\Debug\net8.0\wwwroot\_framework\System.Xml.XmlDocument.wasm.gz
@@ -330,6 +339,7 @@ C:\Users\42060\semestral-client-blazor\BlazorFrontend\bin\Debug\net8.0\wwwroot\_
 C:\Users\42060\semestral-client-blazor\BlazorFrontend\bin\Debug\net8.0\wwwroot\_framework\System.Net.Primitives.wasm.gz
 C:\Users\42060\semestral-client-blazor\BlazorFrontend\bin\Debug\net8.0\wwwroot\_framework\System.ComponentModel.DataAnnotations.wasm.gz
 C:\Users\42060\semestral-client-blazor\BlazorFrontend\bin\Debug\net8.0\wwwroot\_framework\System.IO.MemoryMappedFiles.wasm.gz
+C:\Users\42060\semestral-client-blazor\BlazorFrontend\bin\Debug\net8.0\wwwroot\_framework\zxing.wasm.gz
 C:\Users\42060\semestral-client-blazor\BlazorFrontend\bin\Debug\net8.0\wwwroot\_framework\Blazored.LocalStorage.wasm.gz
 C:\Users\42060\semestral-client-blazor\BlazorFrontend\bin\Debug\net8.0\wwwroot\_framework\System.IO.Compression.wasm.gz
 C:\Users\42060\semestral-client-blazor\BlazorFrontend\bin\Debug\net8.0\wwwroot\_framework\System.Runtime.Handles.wasm.gz
@@ -353,6 +363,7 @@ C:\Users\42060\semestral-client-blazor\BlazorFrontend\bin\Debug\net8.0\wwwroot\_
 C:\Users\42060\semestral-client-blazor\BlazorFrontend\bin\Debug\net8.0\wwwroot\_framework\Microsoft.AspNetCore.Components.Forms.wasm.gz
 C:\Users\42060\semestral-client-blazor\BlazorFrontend\bin\Debug\net8.0\wwwroot\_framework\System.Linq.Parallel.wasm.gz
 C:\Users\42060\semestral-client-blazor\BlazorFrontend\bin\Debug\net8.0\wwwroot\_framework\System.ComponentModel.Annotations.wasm.gz
+C:\Users\42060\semestral-client-blazor\BlazorFrontend\bin\Debug\net8.0\wwwroot\_framework\CodeBeam.MudBlazor.Extensions.wasm.gz
 C:\Users\42060\semestral-client-blazor\BlazorFrontend\bin\Debug\net8.0\wwwroot\_framework\System.Threading.wasm.gz
 C:\Users\42060\semestral-client-blazor\BlazorFrontend\bin\Debug\net8.0\wwwroot\_framework\System.Runtime.Numerics.wasm.gz
 C:\Users\42060\semestral-client-blazor\BlazorFrontend\bin\Debug\net8.0\wwwroot\_framework\System.Xml.wasm.gz
@@ -382,6 +393,7 @@ C:\Users\42060\semestral-client-blazor\BlazorFrontend\bin\Debug\net8.0\wwwroot\_
 C:\Users\42060\semestral-client-blazor\BlazorFrontend\bin\Debug\net8.0\wwwroot\_framework\icudt_EFIGS.dat.gz
 C:\Users\42060\semestral-client-blazor\BlazorFrontend\bin\Debug\net8.0\wwwroot\_framework\System.Runtime.InteropServices.RuntimeInformation.wasm.gz
 C:\Users\42060\semestral-client-blazor\BlazorFrontend\bin\Debug\net8.0\wwwroot\_framework\System.Collections.wasm.gz
+C:\Users\42060\semestral-client-blazor\BlazorFrontend\bin\Debug\net8.0\wwwroot\_framework\CsvHelper.wasm.gz
 C:\Users\42060\semestral-client-blazor\BlazorFrontend\bin\Debug\net8.0\wwwroot\_framework\System.Web.wasm.gz
 C:\Users\42060\semestral-client-blazor\BlazorFrontend\bin\Debug\net8.0\wwwroot\_framework\System.IO.FileSystem.Primitives.wasm.gz
 C:\Users\42060\semestral-client-blazor\BlazorFrontend\bin\Debug\net8.0\wwwroot\_framework\System.Data.Common.wasm.gz
@@ -420,6 +432,8 @@ C:\Users\42060\semestral-client-blazor\BlazorFrontend\bin\Debug\net8.0\BlazorFro
 C:\Users\42060\semestral-client-blazor\BlazorFrontend\bin\Debug\net8.0\BlazorFrontend.dll
 C:\Users\42060\semestral-client-blazor\BlazorFrontend\bin\Debug\net8.0\BlazorFrontend.pdb
 C:\Users\42060\semestral-client-blazor\BlazorFrontend\bin\Debug\net8.0\Blazored.LocalStorage.dll
+C:\Users\42060\semestral-client-blazor\BlazorFrontend\bin\Debug\net8.0\CodeBeam.MudBlazor.Extensions.dll
+C:\Users\42060\semestral-client-blazor\BlazorFrontend\bin\Debug\net8.0\CsvHelper.dll
 C:\Users\42060\semestral-client-blazor\BlazorFrontend\bin\Debug\net8.0\Microsoft.AspNetCore.Authorization.dll
 C:\Users\42060\semestral-client-blazor\BlazorFrontend\bin\Debug\net8.0\Microsoft.AspNetCore.Components.dll
 C:\Users\42060\semestral-client-blazor\BlazorFrontend\bin\Debug\net8.0\Microsoft.AspNetCore.Components.Forms.dll
@@ -447,6 +461,7 @@ C:\Users\42060\semestral-client-blazor\BlazorFrontend\bin\Debug\net8.0\Microsoft
 C:\Users\42060\semestral-client-blazor\BlazorFrontend\bin\Debug\net8.0\MudBlazor.dll
 C:\Users\42060\semestral-client-blazor\BlazorFrontend\bin\Debug\net8.0\MudBlazor.ThemeManager.dll
 C:\Users\42060\semestral-client-blazor\BlazorFrontend\bin\Debug\net8.0\System.IO.Pipelines.dll
+C:\Users\42060\semestral-client-blazor\BlazorFrontend\bin\Debug\net8.0\zxing.dll
 C:\Users\42060\semestral-client-blazor\BlazorFrontend\bin\Debug\net8.0\Microsoft.CSharp.dll
 C:\Users\42060\semestral-client-blazor\BlazorFrontend\bin\Debug\net8.0\Microsoft.VisualBasic.Core.dll
 C:\Users\42060\semestral-client-blazor\BlazorFrontend\bin\Debug\net8.0\Microsoft.VisualBasic.dll
@@ -624,13 +639,9 @@ C:\Users\42060\semestral-client-blazor\BlazorFrontend\bin\Debug\net8.0\dotnet.ru
 C:\Users\42060\semestral-client-blazor\BlazorFrontend\bin\Debug\net8.0\icudt_CJK.dat
 C:\Users\42060\semestral-client-blazor\BlazorFrontend\bin\Debug\net8.0\icudt_EFIGS.dat
 C:\Users\42060\semestral-client-blazor\BlazorFrontend\bin\Debug\net8.0\icudt_no_CJK.dat
-C:\Users\42060\semestral-client-blazor\BlazorFrontend\obj\Debug\net8.0\BlazorFrontend.csproj.AssemblyReference.cache
-C:\Users\42060\semestral-client-blazor\BlazorFrontend\obj\Debug\net8.0\BlazorFrontend.GeneratedMSBuildEditorConfig.editorconfig
-C:\Users\42060\semestral-client-blazor\BlazorFrontend\obj\Debug\net8.0\BlazorFrontend.AssemblyInfoInputs.cache
-C:\Users\42060\semestral-client-blazor\BlazorFrontend\obj\Debug\net8.0\BlazorFrontend.AssemblyInfo.cs
-C:\Users\42060\semestral-client-blazor\BlazorFrontend\obj\Debug\net8.0\BlazorFrontend.csproj.CoreCompileInputs.cache
-C:\Users\42060\semestral-client-blazor\BlazorFrontend\obj\Debug\net8.0\BlazorFrontend.MvcApplicationPartsAssemblyInfo.cache
 C:\Users\42060\semestral-client-blazor\BlazorFrontend\obj\Debug\net8.0\webcil\Blazored.LocalStorage.wasm
+C:\Users\42060\semestral-client-blazor\BlazorFrontend\obj\Debug\net8.0\webcil\CodeBeam.MudBlazor.Extensions.wasm
+C:\Users\42060\semestral-client-blazor\BlazorFrontend\obj\Debug\net8.0\webcil\CsvHelper.wasm
 C:\Users\42060\semestral-client-blazor\BlazorFrontend\obj\Debug\net8.0\webcil\Microsoft.AspNetCore.Authorization.wasm
 C:\Users\42060\semestral-client-blazor\BlazorFrontend\obj\Debug\net8.0\webcil\Microsoft.AspNetCore.Components.wasm
 C:\Users\42060\semestral-client-blazor\BlazorFrontend\obj\Debug\net8.0\webcil\Microsoft.AspNetCore.Components.Forms.wasm
@@ -658,6 +669,7 @@ C:\Users\42060\semestral-client-blazor\BlazorFrontend\obj\Debug\net8.0\webcil\Mi
 C:\Users\42060\semestral-client-blazor\BlazorFrontend\obj\Debug\net8.0\webcil\MudBlazor.wasm
 C:\Users\42060\semestral-client-blazor\BlazorFrontend\obj\Debug\net8.0\webcil\MudBlazor.ThemeManager.wasm
 C:\Users\42060\semestral-client-blazor\BlazorFrontend\obj\Debug\net8.0\webcil\System.IO.Pipelines.wasm
+C:\Users\42060\semestral-client-blazor\BlazorFrontend\obj\Debug\net8.0\webcil\zxing.wasm
 C:\Users\42060\semestral-client-blazor\BlazorFrontend\obj\Debug\net8.0\webcil\Microsoft.CSharp.wasm
 C:\Users\42060\semestral-client-blazor\BlazorFrontend\obj\Debug\net8.0\webcil\Microsoft.VisualBasic.Core.wasm
 C:\Users\42060\semestral-client-blazor\BlazorFrontend\obj\Debug\net8.0\webcil\Microsoft.VisualBasic.wasm
@@ -839,6 +851,8 @@ C:\Users\42060\semestral-client-blazor\BlazorFrontend\obj\Debug\net8.0\staticweb
 C:\Users\42060\semestral-client-blazor\BlazorFrontend\obj\Debug\net8.0\scopedcss\bundle\BlazorFrontend.styles.css
 C:\Users\42060\semestral-client-blazor\BlazorFrontend\obj\Debug\net8.0\compressed\4xatgthill.gz
 C:\Users\42060\semestral-client-blazor\BlazorFrontend\obj\Debug\net8.0\compressed\mea8rtn66c.gz
+C:\Users\42060\semestral-client-blazor\BlazorFrontend\obj\Debug\net8.0\compressed\pwazlam1i1.gz
+C:\Users\42060\semestral-client-blazor\BlazorFrontend\obj\Debug\net8.0\compressed\v3q2yjni68.gz
 C:\Users\42060\semestral-client-blazor\BlazorFrontend\obj\Debug\net8.0\compressed\d6nhrp2u4e.gz
 C:\Users\42060\semestral-client-blazor\BlazorFrontend\obj\Debug\net8.0\compressed\z0rpb6eyz2.gz
 C:\Users\42060\semestral-client-blazor\BlazorFrontend\obj\Debug\net8.0\compressed\pm5cpe5n82.gz
@@ -866,6 +880,7 @@ C:\Users\42060\semestral-client-blazor\BlazorFrontend\obj\Debug\net8.0\compresse
 C:\Users\42060\semestral-client-blazor\BlazorFrontend\obj\Debug\net8.0\compressed\hb75wiipcr.gz
 C:\Users\42060\semestral-client-blazor\BlazorFrontend\obj\Debug\net8.0\compressed\t49pq8gxoq.gz
 C:\Users\42060\semestral-client-blazor\BlazorFrontend\obj\Debug\net8.0\compressed\9ov9w7kfoi.gz
+C:\Users\42060\semestral-client-blazor\BlazorFrontend\obj\Debug\net8.0\compressed\m9ybc8xmwy.gz
 C:\Users\42060\semestral-client-blazor\BlazorFrontend\obj\Debug\net8.0\compressed\ngpi6rxjje.gz
 C:\Users\42060\semestral-client-blazor\BlazorFrontend\obj\Debug\net8.0\compressed\myfw7xba5l.gz
 C:\Users\42060\semestral-client-blazor\BlazorFrontend\obj\Debug\net8.0\compressed\6hjosnr9gc.gz

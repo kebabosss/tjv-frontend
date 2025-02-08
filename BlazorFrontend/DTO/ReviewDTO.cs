@@ -2,10 +2,10 @@
 
 public class ReviewDTO
 {
-    long reviewId;
-    String reviewText;
-    int rating;
-    long movieId;
+    public long reviewId{ get; set; }
+    public String reviewText{ get; set; }
+    public int rating{ get; set; }
+    public long movieId{ get; set; }
 
     public ReviewDTO()
     {
