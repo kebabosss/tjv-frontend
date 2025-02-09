@@ -1,4 +1,5 @@
 ﻿@page "/MovieDetail/{Id:long}"
+@using System.Net
 @using BlazorFrontend.DTO
 @inject NavigationManager Navigation
 @inject IDialogService DialogService
@@ -8,41 +9,13 @@
 
 <MudContainer MaxWidth="MaxWidth.Medium" Style="padding-top: 2%">
     <MudPaper Style="padding: 2%">
-        <MudForm @ref="_form" @bind-IsValid="@_valid" ValidationDelay="0" SuppressImplicitSubmission="false"
-                 ReadOnly="@(!_edit)">
-            <MudTextField @bind-Value="_changedObject.name" Label="Název" Variant="@_textFieldVariant" Required="true"
-                          HelperTextOnFocus="true" HelperText="@_helperText"/>
-            <MudNumericField @bind-Value="_changedObject.releaseYear" Label="Rok vydání" Variant="@_textFieldVariant" Required="true"
-                             HelperTextOnFocus="true" HelperText="@_helperText"/>
+        <MudForm @ref="_form" @bind-IsValid="@_valid" ValidationDelay="0" SuppressImplicitSubmission="false">
+            <MudTextField @bind-Value="_changedObject.name" Label="Název" Variant="Variant.Outlined" Required="true"/>
+            <MudNumericField @bind-Value="_changedObject.releaseYear" Min="1874" Max="DateTime.Now.Year" Label="Rok vydání" Variant="Variant.Outlined" Required="true"/>
         </MudForm>
     </MudPaper>
-    <MudContainer Style="padding-left: 0; padding-right: 0 ; padding-top: 1%">
-        <MudStack Row="true" Justify="Justify.FlexEnd">
-            <MudSpacer></MudSpacer>
-            <MudButton OnClick="@GoBackClicked" Color="@Color.Default" Variant="Variant.Outlined" Size="Size.Large"
-                       Class="add-item-btn" hidden="@(_edit)">
-                Zpět
-            </MudButton>
-            <MudButton OnClick="@DeleteClicked" Color="@Color.Error" Variant="Variant.Filled" Size="Size.Large"
-                       Class="add-item-btn" hidden="@(_edit)">
-                Smazat
-            </MudButton>
-            <MudButton OnClick="@EditClicked" Color="@Color.Default" Variant="Variant.Outlined" Size="Size.Large"
-                       Class="add-item-btn" hidden="@(_edit)">
-                Upravit
-            </MudButton>
-            <MudButton OnClick="@CancelClicked" Color="@Color.Default" Variant="Variant.Outlined" Size="Size.Large"
-                       Class="add-item-btn" hidden="@(!_edit)">
-                Zrušit
-            </MudButton>
-            <MudButton OnClick="@SaveClicked" Color="@Color.Success" Variant="Variant.Filled" Size="Size.Large"
-                       Class="add-item-btn" hidden="@(!_edit)" Disabled="@(!_valid)">
-                Uložit
-            </MudButton>
-        </MudStack>
-    </MudContainer>
     <MudContainer Style="padding-top: 1%; padding-right: 0; padding-left: 0">
-        <MudContainer MaxWidth="MaxWidth.Large" Style="position: relative; padding: 3% 0 5%;">
+        <MudContainer MaxWidth="MaxWidth.Large" Style="position: relative; padding: 3% 0 3%;" hidden="@_directorAdd">
             <MudDataGrid T="DirectorDTO" MultiSelection="false" Items="@_directorData" SortMode="SortMode.Multiple"
                          Filterable="false"
                          Hideable="false" Dense="true" Striped="true" ShowColumnOptions="false" Loading="@_loading">
@@ -57,16 +30,45 @@
                     <PropertyColumn Property="x => x.yearOfBirth" Title="Rok narození" Sortable="true"/>
                     <TemplateColumn CellClass="justify-center" Title="Odebrat režiséra">
                         <CellTemplate>
-                           @* <MudIconButton Icon="@Icons.Material.Outlined.RemoveRedEye" Color="Color.Info" Size="Size.Small" OnClick="() => ViewDetailDirector(context.Item.id)"></MudIconButton>*@
+                            @* <MudIconButton Icon="@Icons.Material.Outlined.RemoveRedEye" Color="Color.Info" Size="Size.Small" OnClick="() => ViewDetailDirector(context.Item.id)"></MudIconButton>*@
                             <MudIconButton Icon="@Icons.Material.Outlined.RemoveCircleOutline" Color="Color.Error" Size="Size.Small" OnClick="() => RemoveDirector(context.Item.id)"></MudIconButton>
                         </CellTemplate>
                     </TemplateColumn>
                 </Columns>
             </MudDataGrid>
         </MudContainer>
+        <MudContainer MaxWidth="MaxWidth.Large" Style="position: relative; padding: 3% 0 3%;" hidden="@(!_directorAdd)">
+            <MudForm @ref="_formDirector" @bind-IsValid="@_validDirector" ValidationDelay="0" SuppressImplicitSubmission="false">
+                <MudTextField @bind-Value="dirName" Label="Jméno" Variant="Variant.Outlined" Required="true"
+                              HelperTextOnFocus="true"/>
+                <MudNumericField @bind-Value="dirBorn" Min="1826" Max="@(DateTime.Now.Year)" Label="Rok narození" Variant="Variant.Outlined" Required="true"
+                                 HelperTextOnFocus="true"/>
+            </MudForm>
+        </MudContainer>
+    </MudContainer>
+    <MudContainer Style="padding-left: 0; padding-right: 0 ; padding-top: 1%">
+        <MudStack Row="true" Justify="Justify.FlexEnd">
+            <MudSpacer></MudSpacer>
+            <MudButton OnClick="@GoBackClicked" Color="@Color.Default" Variant="Variant.Outlined" Size="Size.Large"
+                       Class="add-item-btn">
+                Zpět
+            </MudButton>
+            <MudButton OnClick="@DeleteClicked" Color="@Color.Error" Variant="Variant.Filled" Size="Size.Large"
+                       Class="add-item-btn">
+                Smazat
+            </MudButton>
+            <MudButton OnClick="@CancelClicked" Color="@Color.Default" Variant="Variant.Outlined" Size="Size.Large"
+                       Class="add-item-btn">
+                Zahodit změny
+            </MudButton>
+            <MudButton OnClick="@SaveClicked" Color="@Color.Success" Variant="Variant.Filled" Size="Size.Large"
+                       Class="add-item-btn"  Disabled="@(!_valid || (_directorAdd && !_validDirector))">
+                Uložit
+            </MudButton>
+        </MudStack>
     </MudContainer>
     <MudContainer Style="padding-top: 1%; padding-right: 0; padding-left: 0">
-        <MudContainer MaxWidth="MaxWidth.Large" Style="position: relative; padding: 3% 0 5%;min-height: 300px"
+        <MudContainer MaxWidth="MaxWidth.Large" Style="position: relative; padding: 3% 0 3%;min-height: 300px"
                       hidden="@(_emptyReviews)">
             <MudContainer MaxWidth="MaxWidth.Large" Style="position: relative; padding: 0 0 0 0;">
                 <MudStack Row="true">
@@ -122,12 +124,14 @@
     [Parameter]
     public long Id { get; set; }
 
-    private bool _edit;
+    private bool _directorAdd = false;
+    private string dirName;
+    private int dirBorn;
     private bool _emptyReviews;
     private bool _valid = true;
-    private Variant _textFieldVariant = Variant.Filled;
-    private string _helperText = "Tato hodnota je pouze pro čtení";
+    private bool _validDirector = true;
     private MudForm? _form;
+    private MudForm? _formDirector;
     private MovieDTO _changedObject = new();
     private List<ReviewDTO> _reviewData = [];
     private List<DirectorDTO> _directorData = [];
@@ -139,6 +143,7 @@
     {
         await base.OnInitializedAsync();
         await RefreshList();
+        await _form.Validate();
     }
 
 
@@ -158,6 +163,29 @@
 
     public void AddDirector()
     {
+        _directorAdd = true;
+    }
+
+    public async Task SaveDir()
+    {
+        var result = await Http.GetFromJsonAsync<List<DirectorDTO>>($"/rest/director/director?name={dirName}&year={dirBorn}");
+        if (result != null)
+        {
+            if (result.Count == 0)
+            {
+                Snackbar.Add("Zadaný režisér nebyl nalezen", Severity.Error);
+            }
+            else
+            {
+                Snackbar.Add("Režisér byl úspěšně nalezen", Severity.Success);
+                _changedObject.directors.Add(result.First().id);
+            }
+        }
+
+        dirBorn = 0;
+        dirName = "";
+        await _formDirector.ResetAsync();
+        _directorAdd = false;
     }
 
     private async Task GetReviews()
@@ -215,13 +243,7 @@
 
     public void RemoveDirector(long directorId)
     {
-    }
-
-    private void EditClicked()
-    {
-        _edit = !_edit;
-        SwapHelperText();
-        SwapVariant();
+        
     }
 
     private void GoBackClicked()
@@ -253,9 +275,11 @@
 
         if (result?.Data as bool? == true)
         {
-            EditClicked();
-
-
+            if (_directorAdd)
+            {
+                await SaveDir();
+                _directorAdd = false;
+            }
             var response = await Http.PutAsJsonAsync($"rest/movie/{_changedObject.id}", _changedObject);
 
             if (response.IsSuccessStatusCode)
@@ -266,17 +290,27 @@
             {
                 Snackbar.Add($"Uložení vrátilo chybový kód: {response.StatusCode}", Severity.Error);
             }
+
+            await GetDirectors();
+            StateHasChanged();
         }
     }
 
     private async Task CancelClicked()
     {
-        EditClicked();
         if (_form != null)
         {
             await _form.ResetAsync();
         }
+        
+        if (_formDirector != null)
+        {
+            await _formDirector.ResetAsync();
+        }
 
+        dirBorn = 0;
+        dirName = "";
+        _directorAdd = false;
         await RefreshList();
         StateHasChanged();
     }
@@ -302,29 +336,4 @@
 
         return false;
     };
-
-    private void SwapVariant()
-    {
-        if (_textFieldVariant == Variant.Filled)
-        {
-            _textFieldVariant = Variant.Outlined;
-        }
-        else
-        {
-            _textFieldVariant = Variant.Filled;
-        }
-    }
-
-    private void SwapHelperText()
-    {
-        if (_helperText == "")
-        {
-            _helperText = "Tato hodnota je pouze pro čtení";
-        }
-        else
-        {
-            _helperText = "";
-        }
-    }
-
 }

@@ -11,7 +11,7 @@
         <MudForm @ref="_form" @bind-IsValid="@_valid" ValidationDelay="0" SuppressImplicitSubmission="false">
             <MudTextField @bind-Value="_newObject.name" Label="Jméno" Variant="Variant.Outlined" Required="true"
                           HelperTextOnFocus="true"/>
-            <MudNumericField @bind-Value="_newObject.yearOfBirth" Label="Rok narození" Variant="Variant.Outlined" Required="true"
+            <MudNumericField @bind-Value="_newObject.yearOfBirth" Min="1826" Max="@(DateTime.Now.Year)" Label="Rok narození" Variant="Variant.Outlined" Required="true"
                           HelperTextOnFocus="true"/>
         </MudForm>
     </MudPaper>

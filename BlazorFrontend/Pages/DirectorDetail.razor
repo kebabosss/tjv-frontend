@@ -12,7 +12,7 @@
                  ReadOnly="@(!_edit)">
             <MudTextField @bind-Value="_changedObject.name" Label="Jméno" Variant="@_textFieldVariant" Required="true"
                           HelperTextOnFocus="true" HelperText="@_helperText"/>
-            <MudNumericField @bind-Value="_changedObject.yearOfBirth" Label="Jméno" Variant="@_textFieldVariant" Required="true"
+            <MudNumericField @bind-Value="_changedObject.yearOfBirth" Label="Rok narození" Min="1826" Max="@(DateTime.Now.Year)" Variant="@_textFieldVariant" Required="true"
                              HelperTextOnFocus="true" HelperText="@_helperText"/>
         </MudForm>
     </MudPaper>
