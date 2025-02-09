@@ -1,0 +1,191 @@
+﻿@page "/ReviewDetail/{Id:long}"
+@using BlazorFrontend.DTO
+@inject NavigationManager Navigation
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
+@inject HttpClient Http
+
+
+<MudContainer MaxWidth="MaxWidth.Medium" Style="padding-top: 2%">
+    <MudPaper Style="padding: 2%">
+        <MudForm @ref="_form" @bind-IsValid="@_valid" ValidationDelay="0" SuppressImplicitSubmission="false"
+                 ReadOnly="@(!_edit)">
+            <MudTextField @bind-Value="_changedObject.reviewText" Label="Text recenze" Variant="@_textFieldVariant" Required="false"
+                          HelperTextOnFocus="true" HelperText="@_helperText"/>
+            <MudRating @bind-SelectedValue="_changedObject.rating" ReadOnly="@(!_edit)"/>
+        </MudForm>
+    </MudPaper>
+    <MudContainer Style="padding-left: 0; padding-right: 0 ; padding-top: 1%">
+        <MudStack Row="true" Justify="Justify.FlexEnd">
+            <MudSpacer></MudSpacer>
+            <MudButton OnClick="@GoBackClicked" Color="@Color.Default" Variant="Variant.Outlined" Size="Size.Large"
+                       Class="add-item-btn" hidden="@(_edit)">
+                Zpět
+            </MudButton>
+            <MudButton OnClick="@DeleteClicked" Color="@Color.Error" Variant="Variant.Filled" Size="Size.Large"
+                       Class="add-item-btn" hidden="@(_edit)">
+                Smazat
+            </MudButton>
+            <MudButton OnClick="@EditClicked" Color="@Color.Default" Variant="Variant.Outlined" Size="Size.Large"
+                       Class="add-item-btn" hidden="@(_edit)">
+                Upravit
+            </MudButton>
+            <MudButton OnClick="@CancelClicked" Color="@Color.Default" Variant="Variant.Outlined" Size="Size.Large"
+                       Class="add-item-btn" hidden="@(!_edit)">
+                Zrušit
+            </MudButton>
+            <MudButton OnClick="@SaveClicked" Color="@Color.Success" Variant="Variant.Filled" Size="Size.Large"
+                       Class="add-item-btn" hidden="@(!_edit)" Disabled="@(!_valid)">
+                Uložit
+            </MudButton>
+        </MudStack>
+    </MudContainer>
+</MudContainer>
+
+@code
+{
+    /// <summary>
+    ///  ID of the document.
+    /// </summary>
+    [Parameter]
+    public long Id { get; set; }
+
+    private bool _edit;
+    private bool _valid = true;
+    private Variant _textFieldVariant = Variant.Filled;
+    private string _helperText = "Tato hodnota je pouze pro čtení";
+    private MudForm? _form;
+    private ReviewDTO _changedObject = new();
+
+    /// <summary>
+    /// Initializes the component.
+    /// </summary>
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        await RefreshList();
+    }
+
+
+    private async Task RefreshList()
+    {
+        var result = await Http.GetFromJsonAsync<ReviewDTO>($"/rest/review/{Id}");
+        if (result == null)
+        {
+            return;
+        }
+
+        _changedObject = result;
+        StateHasChanged();
+    }
+
+    private async Task DeleteClicked()
+    {
+        var parameters = new DialogParameters
+        {
+            { "ContentText", "Potvrdit smazání recenze" },
+            { "ButtonText", "Smazat" },
+            { "Color", Color.Error }
+        };
+
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
+
+        var result = await DialogService.Show<Dialog>("Potvrdit", parameters, options).Result;
+
+
+        if (result?.Data as bool? == true)
+        {
+            EditClicked();
+            var response = await Http.DeleteAsync($"/rest/review/{_changedObject.reviewId}");
+
+            if (response.IsSuccessStatusCode)
+            {
+                GoBackClicked();
+                Snackbar.Add("Smazání recenze bylo úspěšné", Severity.Success);
+            }
+            else
+            {
+                Snackbar.Add($"Smazaní recenze vrátilo chybu: {response.StatusCode}", Severity.Error);
+            }
+        }
+    }
+
+    private void EditClicked()
+    {
+        _edit = !_edit;
+        SwapHelperText();
+        SwapVariant();
+    }
+
+    private void GoBackClicked()
+    {
+        Navigation.NavigateTo($"/movieDetail/{_changedObject.movieId}");
+    }
+
+
+    private async Task SaveClicked()
+    {
+        var parameters = new DialogParameters
+        {
+            { "ContentText", "Potvrdit uložení změn recenze" },
+            { "ButtonText", "Uložit" },
+            { "Color", Color.Success }
+        };
+
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
+
+        var result = await DialogService.Show<Dialog>("Potvrdit", parameters, options).Result;
+
+        if (result?.Data as bool? == true)
+        {
+            EditClicked();
+            var response = await Http.PutAsJsonAsync($"/rest/review/{_changedObject.reviewId}", _changedObject);
+
+            if (response.IsSuccessStatusCode)
+            {
+                Snackbar.Add("Uložení změn bylo úspěšné", Severity.Success);
+            }
+            else
+            {
+                Snackbar.Add($"Uložení vrátilo chybový kód: {response.StatusCode}", Severity.Error);
+            }
+        }
+    }
+
+    private async Task CancelClicked()
+    {
+        EditClicked();
+        if (_form != null)
+        {
+            await _form.ResetAsync();
+        }
+
+        await RefreshList();
+        StateHasChanged();
+    }
+
+    private void SwapVariant()
+    {
+        if (_textFieldVariant == Variant.Filled)
+        {
+            _textFieldVariant = Variant.Outlined;
+        }
+        else
+        {
+            _textFieldVariant = Variant.Filled;
+        }
+    }
+
+    private void SwapHelperText()
+    {
+        if (_helperText == "")
+        {
+            _helperText = "Tato hodnota je pouze pro čtení";
+        }
+        else
+        {
+            _helperText = "";
+        }
+    }
+
+}

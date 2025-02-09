@@ -41,6 +41,14 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGlhbG9nLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/42060/semestral-client-blazor/BlazorFrontend/Pages/DirectorAdd.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGlyZWN0b3JBZGQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/42060/semestral-client-blazor/BlazorFrontend/Pages/DirectorDetail.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGlyZWN0b3JEZXRhaWwucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/42060/semestral-client-blazor/BlazorFrontend/Pages/DirectorList.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRGlyZWN0b3JMaXN0LnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
@@ -55,6 +63,14 @@ build_metadata.AdditionalFiles.CssScope =
 
 [C:/Users/42060/semestral-client-blazor/BlazorFrontend/Pages/MovieList.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTW92aWVMaXN0LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/42060/semestral-client-blazor/BlazorFrontend/Pages/ReviewAdd.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmV2aWV3QWRkLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/42060/semestral-client-blazor/BlazorFrontend/Pages/ReviewDetail.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmV2aWV3RGV0YWlsLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/42060/semestral-client-blazor/BlazorFrontend/_Imports.razor]

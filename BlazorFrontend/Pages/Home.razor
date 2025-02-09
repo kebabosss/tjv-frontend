@@ -1,1 +1,17 @@
 ﻿@page "/"
+@inject HttpClient Http
+<MudStack Style="padding: 10%">
+    <MudText Typo="Typo.h3"> Víteje ve filové databázy. Aktuálně vedeme tolik dobrých filmů: @_count </MudText>
+</MudStack>
+
+@code
+{
+    private int _count = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        var result = await Http.GetFromJsonAsync<int>($"/rest/movie/countGood");
+        _count = result;
+    }
+}

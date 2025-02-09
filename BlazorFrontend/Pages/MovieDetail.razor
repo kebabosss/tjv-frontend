@@ -1,292 +1,330 @@
 ﻿@page "/MovieDetail/{Id:long}"
 @using BlazorFrontend.DTO
-@using Microsoft.AspNetCore.Authorization
-@using MudBlazor
 @inject NavigationManager Navigation
 @inject IDialogService DialogService
 @inject ISnackbar Snackbar
 @inject HttpClient Http
 
 
-@attribute [Authorize]
 <MudContainer MaxWidth="MaxWidth.Medium" Style="padding-top: 2%">
-	<MudPaper Style="padding: 2%">
-		<MudForm @ref="_form" @bind-IsValid="@_valid" ValidationDelay="0" SuppressImplicitSubmission="false"
-		         ReadOnly="@(!_edit)">
-			<MudTextField @bind-Value="_changedObject.name" Label="Název" Variant="@_textFieldVariant" Required="true"
-			              HelperTextOnFocus="true" HelperText="@_helperText"/>
-			<MudNumericField @bind-Value="_changedObject.releaseYear" Label="Rok vydání" Variant="@_textFieldVariant" Required="true"
-			                 HelperTextOnFocus="true" HelperText="@_helperText"/>
-		</MudForm>
-	</MudPaper>
-	<MudContainer Style="padding-left: 0; padding-right: 0 ; padding-top: 1%">
-		<MudStack Row="true" Justify="Justify.FlexEnd">
-			<MudSpacer></MudSpacer>
-			<MudButton OnClick="@GoBackClicked" Color="@Color.Default" Variant="Variant.Outlined" Size="Size.Large"
-			           Class="add-item-btn" hidden="@(_edit)">Zpět
-			</MudButton>
-			<MudButton OnClick="@DeleteClicked" Color="@Color.Error" Variant="Variant.Filled" Size="Size.Large"
-			           Class="add-item-btn" hidden="@(_edit)">Smazat
-			</MudButton>
-			<MudButton OnClick="@EditClicked" Color="@Color.Default" Variant="Variant.Outlined" Size="Size.Large"
-			           Class="add-item-btn" hidden="@(_edit)">Upravit
-			</MudButton>
-			<MudButton OnClick="@CancelClicked" Color="@Color.Default" Variant="Variant.Outlined" Size="Size.Large"
-			           Class="add-item-btn" hidden="@(!_edit)">Zrušit
-			</MudButton>
-			<MudButton OnClick="@SaveClicked" Color="@Color.Success" Variant="Variant.Filled" Size="Size.Large"
-			           Class="add-item-btn" hidden="@(!_edit)" Disabled="@(!_valid)">Uložit
-			</MudButton>
-		</MudStack>
-	</MudContainer>
-	<MudContainer Style="padding-top: 1%; padding-right: 0; padding-left: 0">
-		<MudContainer MaxWidth="MaxWidth.Large" Style="position: relative; padding: 3% 0 5%;min-height: 300px">
-			<MudContainer MaxWidth="MaxWidth.Large" Style="position: relative; padding: 0 0 0 0;">
-				<MudStack Row="true">
-				</MudStack>
-			</MudContainer>
-			<MudDataGrid T="long" MultiSelection="false" Items="@(_changedObject.directors)" SortMode="SortMode.Multiple"
-			             Filterable="false"
-			             Hideable="false" Dense="true" Striped="true" ShowColumnOptions="false" Loading="@_loading">
-				<ToolBarContent>
-					<MudText Typo="Typo.h6">Režiséři</MudText>
-					<MudSpacer/>
-					<MudButton Variant="Variant.Outlined" Color="Color.Default" OnClick="@AddDirector">Přidat režiséra</MudButton>
-				</ToolBarContent>
-				<Columns>
-					<PropertyColumn Property="x => x" Title="Id" Sortable="true"
-					                InitialDirection="SortDirection.Ascending"/>
-					<TemplateColumn CellClass="justify-center" Title="Akce" >
-						<CellTemplate>
-							<MudIconButton Icon="@Icons.Material.Outlined.RemoveRedEye" Color="Color.Info" Size="Size.Small" OnClick="() => ViewDetailDirector(context.Item)"></MudIconButton>
-							<MudIconButton Icon="@Icons.Material.Outlined.RemoveCircleOutline" Color="Color.Error" Size="Size.Small" OnClick="() => RemoveDirector(context.Item)"></MudIconButton></CellTemplate>
-					</TemplateColumn>
-				</Columns>
-			</MudDataGrid>
-		</MudContainer>
-	</MudContainer>
-<MudContainer Style="padding-top: 1%; padding-right: 0; padding-left: 0">
-	<MudContainer MaxWidth="MaxWidth.Large" Style="position: relative; padding: 3% 0 5%;min-height: 300px"
-	              hidden="@(_emptyReviews)">
-		<MudContainer MaxWidth="MaxWidth.Large" Style="position: relative; padding: 0 0 0 0;">
-			<MudStack Row="true">
-			</MudStack>
-		</MudContainer>
-		<MudDataGrid T="ReviewDTO" MultiSelection="false" Items="@_reviewData" SortMode="SortMode.Multiple"
-		             Filterable="false" QuickFilter="@QuickFilter"
-		             Hideable="false" Dense="true" Striped="true" ShowColumnOptions="false" Loading="@_loading">
-			<ToolBarContent>
-				<MudText Typo="Typo.h6">Recenze</MudText>
-				<MudSpacer/>
-				<MudTextField @bind-Value="_searchString" Placeholder="Vyhledat" Adornment="Adornment.Start"
-				              Immediate="true"
-				              AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0">
-				</MudTextField>
-			</ToolBarContent>
-			<Columns>
-				<PropertyColumn Property="x => x.reviewId" Title="Id" Sortable="true"
-				                InitialDirection="SortDirection.Ascending"/>
-				<PropertyColumn Property="x => x.reviewText" Title="Text recenze"/>
-				<TemplateColumn CellClass="justify-center" Title="Hodnocení">
-					<CellTemplate>
-						<MudStack Row>
-							<MudRating Size="@Size.Small" @bind-SelectedValue="@context.Item.rating" ReadOnly="true"/>
-						</MudStack>
-					</CellTemplate>
-				</TemplateColumn>
-				<TemplateColumn CellClass="justify-center" Title="Zobrazit">
-					<CellTemplate>
-						<MudIconButton Icon="@Icons.Material.Outlined.RemoveRedEye" Color="Color.Info" Size="Size.Small" OnClick="() => ViewDetailReview(context.Item.reviewId)"></MudIconButton>
-					</CellTemplate>
-				</TemplateColumn>
-			</Columns>
-			<PagerContent>
-				<MudDataGridPager T="ReviewDTO" RowsPerPageString="Položek na stránku: "/>
-			</PagerContent>
-		</MudDataGrid>
-		<MudStack Row="true" Justify="Justify.FlexEnd" Style="padding-bottom: 2%; padding-top: 1%">
-			<MudButton OnClick="@AddItem" Color="@Color.Default" Variant="Variant.Outlined" Size="Size.Large"
-			           Class="add-item-btn" hidden="@_edit" Style="justify-content: start; display: flex">Vytvořit recenzi
-			</MudButton>
-		</MudStack>
-	</MudContainer>
-
-</MudContainer>
+    <MudPaper Style="padding: 2%">
+        <MudForm @ref="_form" @bind-IsValid="@_valid" ValidationDelay="0" SuppressImplicitSubmission="false"
+                 ReadOnly="@(!_edit)">
+            <MudTextField @bind-Value="_changedObject.name" Label="Název" Variant="@_textFieldVariant" Required="true"
+                          HelperTextOnFocus="true" HelperText="@_helperText"/>
+            <MudNumericField @bind-Value="_changedObject.releaseYear" Label="Rok vydání" Variant="@_textFieldVariant" Required="true"
+                             HelperTextOnFocus="true" HelperText="@_helperText"/>
+        </MudForm>
+    </MudPaper>
+    <MudContainer Style="padding-left: 0; padding-right: 0 ; padding-top: 1%">
+        <MudStack Row="true" Justify="Justify.FlexEnd">
+            <MudSpacer></MudSpacer>
+            <MudButton OnClick="@GoBackClicked" Color="@Color.Default" Variant="Variant.Outlined" Size="Size.Large"
+                       Class="add-item-btn" hidden="@(_edit)">
+                Zpět
+            </MudButton>
+            <MudButton OnClick="@DeleteClicked" Color="@Color.Error" Variant="Variant.Filled" Size="Size.Large"
+                       Class="add-item-btn" hidden="@(_edit)">
+                Smazat
+            </MudButton>
+            <MudButton OnClick="@EditClicked" Color="@Color.Default" Variant="Variant.Outlined" Size="Size.Large"
+                       Class="add-item-btn" hidden="@(_edit)">
+                Upravit
+            </MudButton>
+            <MudButton OnClick="@CancelClicked" Color="@Color.Default" Variant="Variant.Outlined" Size="Size.Large"
+                       Class="add-item-btn" hidden="@(!_edit)">
+                Zrušit
+            </MudButton>
+            <MudButton OnClick="@SaveClicked" Color="@Color.Success" Variant="Variant.Filled" Size="Size.Large"
+                       Class="add-item-btn" hidden="@(!_edit)" Disabled="@(!_valid)">
+                Uložit
+            </MudButton>
+        </MudStack>
+    </MudContainer>
+    <MudContainer Style="padding-top: 1%; padding-right: 0; padding-left: 0">
+        <MudContainer MaxWidth="MaxWidth.Large" Style="position: relative; padding: 3% 0 5%;">
+            <MudDataGrid T="DirectorDTO" MultiSelection="false" Items="@_directorData" SortMode="SortMode.Multiple"
+                         Filterable="false"
+                         Hideable="false" Dense="true" Striped="true" ShowColumnOptions="false" Loading="@_loading">
+                <ToolBarContent>
+                    <MudText Typo="Typo.h6">Režiséři</MudText>
+                    <MudSpacer/>
+                    <MudButton Variant="Variant.Outlined" Color="Color.Default" OnClick="@AddDirector">Přidat režiséra</MudButton>
+                </ToolBarContent>
+                <Columns>
+                    <PropertyColumn Property="x => x.name" Title="Jméno" Sortable="true"
+                                    InitialDirection="SortDirection.Ascending"/>
+                    <PropertyColumn Property="x => x.yearOfBirth" Title="Rok narození" Sortable="true"/>
+                    <TemplateColumn CellClass="justify-center" Title="Odebrat režiséra">
+                        <CellTemplate>
+                           @* <MudIconButton Icon="@Icons.Material.Outlined.RemoveRedEye" Color="Color.Info" Size="Size.Small" OnClick="() => ViewDetailDirector(context.Item.id)"></MudIconButton>*@
+                            <MudIconButton Icon="@Icons.Material.Outlined.RemoveCircleOutline" Color="Color.Error" Size="Size.Small" OnClick="() => RemoveDirector(context.Item.id)"></MudIconButton>
+                        </CellTemplate>
+                    </TemplateColumn>
+                </Columns>
+            </MudDataGrid>
+        </MudContainer>
+    </MudContainer>
+    <MudContainer Style="padding-top: 1%; padding-right: 0; padding-left: 0">
+        <MudContainer MaxWidth="MaxWidth.Large" Style="position: relative; padding: 3% 0 5%;min-height: 300px"
+                      hidden="@(_emptyReviews)">
+            <MudContainer MaxWidth="MaxWidth.Large" Style="position: relative; padding: 0 0 0 0;">
+                <MudStack Row="true">
+                </MudStack>
+            </MudContainer>
+            <MudDataGrid T="ReviewDTO" MultiSelection="false" Items="@_reviewData" SortMode="SortMode.Multiple"
+                         Filterable="false" QuickFilter="@QuickFilter"
+                         Hideable="false" Dense="true" Striped="true" ShowColumnOptions="false" Loading="@_loading">
+                <ToolBarContent>
+                    <MudText Typo="Typo.h6">Recenze</MudText>
+                    <MudSpacer/>
+                    <MudTextField @bind-Value="_searchString" Placeholder="Vyhledat" Adornment="Adornment.Start"
+                                  Immediate="true"
+                                  AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0">
+                    </MudTextField>
+                </ToolBarContent>
+                <Columns>
+                    <PropertyColumn Property="x => x.reviewId" Title="Id" Sortable="true"
+                                    InitialDirection="SortDirection.Ascending"/>
+                    <PropertyColumn Property="x => x.reviewText" Title="Text recenze"/>
+                    <TemplateColumn CellClass="justify-center" Title="Hodnocení" Sortable="true" SortBy="reviewDTO => reviewDTO.rating">
+                        <CellTemplate>
+                            <MudStack Row>
+                                <MudRating Size="@Size.Small" @bind-SelectedValue="@context.Item.rating" ReadOnly="true"/>
+                            </MudStack>
+                        </CellTemplate>
+                    </TemplateColumn>
+                    <TemplateColumn CellClass="justify-center" Title="Zobrazit">
+                        <CellTemplate>
+                            <MudIconButton Icon="@Icons.Material.Outlined.RemoveRedEye" Color="Color.Info" Size="Size.Small" OnClick="() => ViewDetailReview(context.Item.reviewId)"></MudIconButton>
+                        </CellTemplate>
+                    </TemplateColumn>
+                </Columns>
+                <PagerContent>
+                    <MudDataGridPager T="ReviewDTO" RowsPerPageString="Položek na stránku: "/>
+                </PagerContent>
+            </MudDataGrid>
+        </MudContainer>
+        <MudStack Row="true" Justify="Justify.FlexEnd" Style="padding-bottom: 2%; padding-top: 1%">
+            <MudButton OnClick="@AddReview" Color="@Color.Default" Variant="Variant.Outlined" Size="Size.Large"
+                       Class="add-item-btn" Style="justify-content: start; display: flex">
+                Vytvořit recenzi
+            </MudButton>
+        </MudStack>
+    </MudContainer>
 </MudContainer>
 
 @code
 {
-    	/// <summary>
-	///  ID of the document.
-	/// </summary>
-	[Parameter]
-	public long Id { get; set; }
+    /// <summary>
+    ///  ID of the document.
+    /// </summary>
+    [Parameter]
+    public long Id { get; set; }
 
-	private bool _edit;
-	private bool _emptyReviews;
-	private bool _valid = true;
-	private Variant _textFieldVariant = Variant.Filled;
-	private string _helperText = "Tato hodnota je pouze pro čtení";
-	private MudForm? _form;
-	private MovieDTO _changedObject = new();
-	private List<ReviewDTO> _reviewData = [];
-	
-	/// <summary>
-	/// Initializes the component.
-	/// </summary>
-	protected override async Task OnInitializedAsync() {
-		await base.OnInitializedAsync();
-		await RefreshList();
-	}
-	
-	
-	private async Task RefreshList() {
-		var result = await Http.GetFromJsonAsync<MovieDTO>($"/rest/movie/{Id}");
-		if (result == null) {
-			return;
-		}
+    private bool _edit;
+    private bool _emptyReviews;
+    private bool _valid = true;
+    private Variant _textFieldVariant = Variant.Filled;
+    private string _helperText = "Tato hodnota je pouze pro čtení";
+    private MudForm? _form;
+    private MovieDTO _changedObject = new();
+    private List<ReviewDTO> _reviewData = [];
+    private List<DirectorDTO> _directorData = [];
 
-		_changedObject = result;
-		await GetReviews();
-		StateHasChanged();
-	}
-	
-	public void AddDirector()
-	{}
-
-	private async Task GetReviews() {
-		_loading = true;
-		var result = await Http.GetFromJsonAsync<List<ReviewDTO>>($"/rest/review/movie/{Id}");
-		if (result == null) {
-			return;
-		}
-
-		_reviewData = result;
-		_emptyReviews = _reviewData.Count == 0;
-		_loading = false;
-	}
-	
-	private async Task DeleteClicked() {
-		var parameters = new DialogParameters {
-			{ "ContentText", "Potvrdit smazání dokumentu" },
-			{ "ButtonText", "Smazat" },
-			{ "Color", Color.Error }
-		};
-
-		var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
-
-		var result = await DialogService.Show<Dialog>("Potvrdit", parameters, options).Result;
+    /// <summary>
+    /// Initializes the component.
+    /// </summary>
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        await RefreshList();
+    }
 
 
-		if (result?.Data as bool? == true) {
-			//Document delete is not implemented yet
-			Snackbar.Add("Smazání dokumentu proběhlo úspěšně", Severity.Success);
-			GoBackClicked();
-			return;
-		}
-		
+    private async Task RefreshList()
+    {
+        var result = await Http.GetFromJsonAsync<MovieDTO>($"/rest/movie/{Id}");
+        if (result == null)
+        {
+            return;
+        }
 
-		Snackbar.Add("Smazání dokumentu se nezdařilo", Severity.Error);
-	}
-	
-	public void RemoveDirector(long directorId)
-	{
-			
-	}
+        _changedObject = result;
+        await GetReviews();
+        await GetDirectors();
+        StateHasChanged();
+    }
 
-	private void EditClicked() {
-		_edit = !_edit;
-		SwapHelperText();
-		SwapVariant();
-	}
+    public void AddDirector()
+    {
+    }
 
-	private void GoBackClicked() {
-		Navigation.NavigateTo($"/movieList");
-	}
+    private async Task GetReviews()
+    {
+        _loading = true;
+        var result = await Http.GetFromJsonAsync<List<ReviewDTO>>($"/rest/review/movie/{Id}");
+        if (result == null)
+        {
+            return;
+        }
 
-	private void ViewDetailReview(long movieId)
-	{
-		Navigation.NavigateTo($"/reviewDetail/{movieId}");
-	}
+        _reviewData = result;
+        _emptyReviews = _reviewData.Count == 0;
+        _loading = false;
+    }
 
-	private void ViewDetailDirector(long directorId)
-	{
-		
-	}
+    private async Task GetDirectors()
+    {
+        _loading = true;
+        var result = await Http.GetFromJsonAsync<List<DirectorDTO>>($"/rest/director/movie/{Id}");
+        if (result == null)
+        {
+            return;
+        }
 
-	private async Task SaveClicked() {
-	
-		var parameters = new DialogParameters {
-			{ "ContentText", "Potvrdit uložení změn dokumentu" },
-			{ "ButtonText", "Uložit" },
-			{ "Color", Color.Success }
-		};
+        _directorData = result;
+        _loading = false;
+    }
 
-		var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
+    private async Task DeleteClicked()
+    {
+        var parameters = new DialogParameters
+        {
+            { "ContentText", "Potvrdit smazání filmu" },
+            { "ButtonText", "Smazat" },
+            { "Color", Color.Error }
+        };
 
-		var result = await DialogService.Show<Dialog>("Potvrdit", parameters, options).Result;
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
 
-		if (result?.Data as bool? == true) {
-			EditClicked();
+        var result = await DialogService.Show<Dialog>("Potvrdit", parameters, options).Result;
 
 
-			var response = await Http.PutAsJsonAsync($"rest/movie/{_changedObject.id}", _changedObject);
+        if (result?.Data as bool? == true)
+        {
+            Snackbar.Add("Smazání filmu proběhlo úspěšně", Severity.Success);
+            GoBackClicked();
+            return;
+        }
 
-			if (response.IsSuccessStatusCode) {
-				Snackbar.Add("Uložení změn bylo úspěšné", Severity.Success);
-			}
-			else {
-				Snackbar.Add($"Uložení vrátilo chybový kód: {response.StatusCode}", Severity.Error);
-			}
-		}
-	}
 
-	private async Task CancelClicked() {
-		EditClicked();
-		if (_form != null) {
-			await _form.ResetAsync();
-		}
+        Snackbar.Add("Smazání filmu se nezdařilo", Severity.Error);
+        Snackbar.Add("Smazání filmu se nezdařilo", Severity.Error);
+    }
 
-		await RefreshList();
-		StateHasChanged();
-	}
-	
-	private bool _loading = true;
-	private string? _searchString;
+    public void RemoveDirector(long directorId)
+    {
+    }
 
-	private void AddItem() {
-		Navigation.NavigateTo($"/reviewAdd/{Id}");
-	}
-	
-	private Func<ReviewDTO, bool> QuickFilter => x => {
-		if (string.IsNullOrWhiteSpace(_searchString))
-			return true;
-			if (x.reviewText.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
-				return true;
-		
+    private void EditClicked()
+    {
+        _edit = !_edit;
+        SwapHelperText();
+        SwapVariant();
+    }
 
-		if ($"{x.reviewId} {x.rating}  ".Contains(_searchString))
-			return true;
+    private void GoBackClicked()
+    {
+        Navigation.NavigateTo($"/movieList");
+    }
 
-		return false;
-	};
-	
-	private void SwapVariant() {
-		if (_textFieldVariant == Variant.Filled) {
-			_textFieldVariant = Variant.Outlined;
-		}
-		else {
-			_textFieldVariant = Variant.Filled;
-		}
-	}
+    private void ViewDetailReview(long movieId)
+    {
+        Navigation.NavigateTo($"/reviewDetail/{movieId}");
+    }
 
-	private void SwapHelperText() {
-		if (_helperText == "") {
-			_helperText = "Tato hodnota je pouze pro čtení";
-		}
-		else {
-			_helperText = "";
-		}
-	}
-	
+    private void ViewDetailDirector(long directorId)
+    {
+    }
+
+    private async Task SaveClicked()
+    {
+        var parameters = new DialogParameters
+        {
+            { "ContentText", "Potvrdit uložení změn filmu" },
+            { "ButtonText", "Uložit" },
+            { "Color", Color.Success }
+        };
+
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
+
+        var result = await DialogService.Show<Dialog>("Potvrdit", parameters, options).Result;
+
+        if (result?.Data as bool? == true)
+        {
+            EditClicked();
+
+
+            var response = await Http.PutAsJsonAsync($"rest/movie/{_changedObject.id}", _changedObject);
+
+            if (response.IsSuccessStatusCode)
+            {
+                Snackbar.Add("Uložení změn bylo úspěšné", Severity.Success);
+            }
+            else
+            {
+                Snackbar.Add($"Uložení vrátilo chybový kód: {response.StatusCode}", Severity.Error);
+            }
+        }
+    }
+
+    private async Task CancelClicked()
+    {
+        EditClicked();
+        if (_form != null)
+        {
+            await _form.ResetAsync();
+        }
+
+        await RefreshList();
+        StateHasChanged();
+    }
+
+    private bool _loading = true;
+    private string? _searchString;
+
+    private void AddReview()
+    {
+        Navigation.NavigateTo($"/reviewAdd/{Id}");
+    }
+
+    private Func<ReviewDTO, bool> QuickFilter => x =>
+    {
+        if (string.IsNullOrWhiteSpace(_searchString))
+            return true;
+        if (x.reviewText.Contains(_searchString, StringComparison.OrdinalIgnoreCase))
+            return true;
+
+
+        if ($"{x.reviewId} {x.rating}  ".Contains(_searchString))
+            return true;
+
+        return false;
+    };
+
+    private void SwapVariant()
+    {
+        if (_textFieldVariant == Variant.Filled)
+        {
+            _textFieldVariant = Variant.Outlined;
+        }
+        else
+        {
+            _textFieldVariant = Variant.Filled;
+        }
+    }
+
+    private void SwapHelperText()
+    {
+        if (_helperText == "")
+        {
+            _helperText = "Tato hodnota je pouze pro čtení";
+        }
+        else
+        {
+            _helperText = "";
+        }
+    }
+
 }

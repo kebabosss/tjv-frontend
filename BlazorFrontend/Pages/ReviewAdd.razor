@@ -1,0 +1,95 @@
+﻿@page "/ReviewAdd/{Id:long}"
+@using BlazorFrontend.DTO
+@inject NavigationManager Navigation
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
+@inject HttpClient Http
+
+
+<MudContainer MaxWidth="MaxWidth.Medium" Style="padding-top: 2%">
+    <MudPaper Style="padding: 2%">
+        <MudForm @ref="_form" @bind-IsValid="@_valid" ValidationDelay="0" SuppressImplicitSubmission="false">
+            <MudTextField @bind-Value="_newObject.reviewText" Label="Text recenze" Variant="Variant.Outlined" Required="false"
+                          HelperTextOnFocus="true"/>
+            <MudRating @bind-SelectedValue="_newObject.rating"/>
+        </MudForm>
+    </MudPaper>
+    <MudContainer Style="padding-left: 0; padding-right: 0 ; padding-top: 1%">
+        <MudStack Row="true" Justify="Justify.FlexEnd">
+            <MudSpacer></MudSpacer>
+            <MudButton OnClick="@CancelClicked" Color="@Color.Default" Variant="Variant.Outlined" Size="Size.Large"
+                       Class="add-item-btn">
+                Zrušit
+            </MudButton>
+            <MudButton OnClick="@SaveClicked" Color="@Color.Success" Variant="Variant.Filled" Size="Size.Large"
+                       Class="add-item-btn" Disabled="@(!_valid)">
+                Uložit
+            </MudButton>
+        </MudStack>
+    </MudContainer>
+</MudContainer>
+
+@code
+{
+    /// <summary>
+    ///  ID of the document.
+    /// </summary>
+    [Parameter]
+    public long Id { get; set; }
+
+    private bool _valid = true;
+    private MudForm? _form;
+    private ReviewDTO _newObject = new();
+
+
+    /// <summary>
+    /// Initializes the component.
+    /// </summary>
+    protected override async Task OnInitializedAsync()
+    {
+        _newObject.rating = 2;
+        await base.OnInitializedAsync();
+    }
+
+    private void GoBackClicked()
+    {
+        Navigation.NavigateTo($"/movieDetail/{_newObject.movieId}");
+    }
+
+
+    private async Task SaveClicked()
+    {
+        _newObject.movieId = Id;
+        var parameters = new DialogParameters
+        {
+            { "ContentText", "Potvrdit přidání nové recenze" },
+            { "ButtonText", "Uložit" },
+            { "Color", Color.Success }
+        };
+
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
+
+        var result = await DialogService.Show<Dialog>("Potvrdit", parameters, options).Result;
+
+        if (result?.Data as bool? == true)
+        {
+            var response = await Http.PostAsJsonAsync($"rest/review", _newObject);
+
+            if (response.IsSuccessStatusCode)
+            {
+                Snackbar.Add("Přidání recenze bylo úspěšné", Severity.Success);
+                GoBackClicked();
+            }
+            else
+            {
+                Snackbar.Add($"Přidání recenze vrátilo chybový kód: {response.StatusCode}", Severity.Error);
+            }
+        }
+    }
+
+    private void CancelClicked()
+    {
+        GoBackClicked();
+    }
+
+}
