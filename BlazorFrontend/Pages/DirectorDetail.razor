@@ -8,35 +8,60 @@
 
 <MudContainer MaxWidth="MaxWidth.Medium" Style="padding-top: 2%">
     <MudPaper Style="padding: 2%">
-        <MudForm @ref="_form" @bind-IsValid="@_valid" ValidationDelay="0" SuppressImplicitSubmission="false"
-                 ReadOnly="@(!_edit)">
-            <MudTextField @bind-Value="_changedObject.name" Label="Jméno" Variant="@_textFieldVariant" Required="true"
-                          HelperTextOnFocus="true" HelperText="@_helperText"/>
-            <MudNumericField @bind-Value="_changedObject.yearOfBirth" Label="Rok narození" Min="1826" Max="@(DateTime.Now.Year)" Variant="@_textFieldVariant" Required="true"
-                             HelperTextOnFocus="true" HelperText="@_helperText"/>
+        <MudForm @ref="_form" @bind-IsValid="@_valid" ValidationDelay="0" SuppressImplicitSubmission="false">
+            <MudTextField @bind-Value="_changedObject.name" Label="Jméno" Variant="Variant.Outlined" Required="true"/>
+            <MudNumericField @bind-Value="_changedObject.yearOfBirth" Label="Rok narození" Min="1826" Max="@(DateTime.Now.Year)" Variant="Variant.Outlined" Required="true"/>
         </MudForm>
     </MudPaper>
+    <MudContainer Style="padding-top: 1%; padding-right: 0; padding-left: 0">
+        <MudContainer MaxWidth="MaxWidth.Large" Style="position: relative; padding: 3% 0 3%;" hidden="@_movieAdd">
+            <MudDataGrid T="MovieDTO" MultiSelection="false" Items="@_movieData" SortMode="SortMode.Multiple"
+                         Filterable="false"
+                         Hideable="false" Dense="true" Striped="true" ShowColumnOptions="false">
+                <ToolBarContent>
+                    <MudText Typo="Typo.h6">Filmy</MudText>
+                    <MudSpacer/>
+                    <MudButton Variant="Variant.Outlined" Color="Color.Default" OnClick="@AddMovie">Přidat film</MudButton>
+                </ToolBarContent>
+                <Columns>
+                    <PropertyColumn Property="x => x.name" Title="Název" Sortable="true"
+                                    InitialDirection="SortDirection.Ascending"/>
+                    <PropertyColumn Property="x => x.releaseYear" Title="Rok narození" Sortable="true"/>
+                    <TemplateColumn CellClass="justify-center" Title="Odebrat film">
+                        <CellTemplate>
+                            <MudIconButton Icon="@Icons.Material.Outlined.RemoveCircleOutline" Color="Color.Error" Size="Size.Small" OnClick="() => RemoveMovie(context.Item.id)"></MudIconButton>
+                        </CellTemplate>
+                    </TemplateColumn>
+                </Columns>
+                <PagerContent>
+                    <MudDataGridPager T="MovieDTO" RowsPerPageString="Položek na stránku: "/>
+                </PagerContent>
+            </MudDataGrid>
+        </MudContainer>
+        <MudContainer MaxWidth="MaxWidth.Large" Style="position: relative; padding: 3% 0 3%;" hidden="@(!_movieAdd)">
+            <MudPaper Style="padding: 2%">
+                <MudForm @ref="_formMovie" @bind-IsValid="@_validMovie" ValidationDelay="0" SuppressImplicitSubmission="false">
+                    <MudTextField @bind-Value="movieName" Label="Jméno" Variant="Variant.Outlined" Required="true"
+                                  HelperTextOnFocus="true"/>
+                    <MudNumericField @bind-Value="movieRelease" Min="1874" Max="@(DateTime.Now.Year)" Label="Rok vydání" Variant="Variant.Outlined" Required="true"
+                                     HelperTextOnFocus="true"/>
+                </MudForm>
+            </MudPaper>
+        </MudContainer>
+    </MudContainer>
     <MudContainer Style="padding-left: 0; padding-right: 0 ; padding-top: 1%">
         <MudStack Row="true" Justify="Justify.FlexEnd">
             <MudSpacer></MudSpacer>
             <MudButton OnClick="@GoBackClicked" Color="@Color.Default" Variant="Variant.Outlined" Size="Size.Large"
-                       Class="add-item-btn" hidden="@(_edit)">
+                       Class="add-item-btn" >
                 Zpět
             </MudButton>
             <MudButton OnClick="@DeleteClicked" Color="@Color.Error" Variant="Variant.Filled" Size="Size.Large"
-                       Class="add-item-btn" hidden="@(_edit)">
+                       Class="add-item-btn">
                 Smazat
             </MudButton>
-            <MudButton OnClick="@EditClicked" Color="@Color.Default" Variant="Variant.Outlined" Size="Size.Large"
-                       Class="add-item-btn" hidden="@(_edit)">
-                Upravit
-            </MudButton>
-            <MudButton OnClick="@CancelClicked" Color="@Color.Default" Variant="Variant.Outlined" Size="Size.Large"
-                       Class="add-item-btn" hidden="@(!_edit)">
-                Zrušit
-            </MudButton>
             <MudButton OnClick="@SaveClicked" Color="@Color.Success" Variant="Variant.Filled" Size="Size.Large"
-                       Class="add-item-btn" hidden="@(!_edit)" Disabled="@(!_valid)">
+                       Class="add-item-btn"  Disabled="@(!_valid)">
                 Uložit
             </MudButton>
         </MudStack>
@@ -51,11 +76,14 @@
     [Parameter]
     public long Id { get; set; }
 
-    private bool _edit;
+    private bool _validMovie;
+    private bool _movieAdd = false;
+    private List<MovieDTO> _movieData;
+    private string movieName;
+    private int movieRelease;
     private bool _valid = true;
-    private Variant _textFieldVariant = Variant.Filled;
-    private string _helperText = "Tato hodnota je pouze pro čtení";
     private MudForm? _form;
+    private MudForm? _formMovie;
     private DirectorDTO _changedObject = new();
 
     /// <summary>
@@ -76,6 +104,7 @@
             return;
         }
 
+        await GetMovies();
         _changedObject = result;
         StateHasChanged();
     }
@@ -96,7 +125,6 @@
 
         if (result?.Data as bool? == true)
         {
-            EditClicked();
             var response = await Http.DeleteAsync($"/rest/director/{_changedObject.id}");
 
             if (response.IsSuccessStatusCode)
@@ -111,18 +139,10 @@
         }
     }
 
-    private void EditClicked()
-    {
-        _edit = !_edit;
-        SwapHelperText();
-        SwapVariant();
-    }
-
     private void GoBackClicked()
     {
         Navigation.NavigateTo($"/directorList");
     }
-
 
     private async Task SaveClicked()
     {
@@ -139,7 +159,10 @@
 
         if (result?.Data as bool? == true)
         {
-            EditClicked();
+            if (_movieAdd)
+            {
+                await SaveMovie();
+            }
             var response = await Http.PutAsJsonAsync($"/rest/director/{_changedObject.id}", _changedObject);
 
             if (response.IsSuccessStatusCode)
@@ -150,43 +173,79 @@
             {
                 Snackbar.Add($"Uložení vrátilo chybový kód: {response.StatusCode}", Severity.Error);
             }
+            await RefreshList();
         }
     }
-
-    private async Task CancelClicked()
+    private async Task AddMovie()
     {
-        EditClicked();
-        if (_form != null)
+        await _form.Validate();
+        _movieAdd = true;
+    }
+
+    private async Task SaveMovie()
+    {
+        var result = await Http.GetFromJsonAsync<List<MovieDTO>>($"/rest/movie/movie?name={movieName}&year={movieRelease}");
+        if (result != null)
         {
-            await _form.ResetAsync();
+            if (result.Count == 0)
+            {
+                Snackbar.Add("Zadaný film nebyl nalezen", Severity.Error);
+            }
+            else
+            {
+                Snackbar.Add("Film byl úspěšně nalezen", Severity.Success);
+                _changedObject.moviesDirected.Add(result.First().id);
+            }
         }
 
-        await RefreshList();
+        movieRelease = 0;
+        movieName = "";
+        await _formMovie.ResetAsync();
+        _movieAdd = false;
+    }
+
+    private async Task GetMovies()
+    {
+        var result = await Http.GetFromJsonAsync<List<MovieDTO>>($"/rest/movie/director/{Id}");
+        if (result == null)
+        {
+            return;
+        }
+
+        _movieData = result;
         StateHasChanged();
     }
-
-    private void SwapVariant()
+    
+    public async Task RemoveMovie(long movieId)
     {
-        if (_textFieldVariant == Variant.Filled)
+        var parameters = new DialogParameters
         {
-            _textFieldVariant = Variant.Outlined;
-        }
-        else
+            { "ContentText", "Potvrdit odebrání filmu z tvorby tohoto režiséra. Pokud se bude jednat o jediného režiséra nějakého snímku, tak snímek bude taky odstraněn" },
+            { "ButtonText", "Odebrat" },
+            { "Color", Color.Error }
+        };
+
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
+
+        var result = await DialogService.Show<Dialog>("Potvrdit", parameters, options).Result;
+
+        if (result?.Data as bool? == true)
         {
-            _textFieldVariant = Variant.Filled;
+            _changedObject.moviesDirected.Remove(movieId);
+
+            var response = await Http.PutAsJsonAsync($"rest/director/{_changedObject.id}", _changedObject);
+
+            if (response.IsSuccessStatusCode)
+            {
+                Snackbar.Add("Odebrání filmu bylo úspěšné", Severity.Success);
+            }
+            else
+            {
+                Snackbar.Add($"Odebrání filmu vrátilo chybový kód: {response.StatusCode}", Severity.Error);
+            }
+
+            await GetMovies();
+            StateHasChanged();
         }
     }
-
-    private void SwapHelperText()
-    {
-        if (_helperText == "")
-        {
-            _helperText = "Tato hodnota je pouze pro čtení";
-        }
-        else
-        {
-            _helperText = "";
-        }
-    }
-
 }

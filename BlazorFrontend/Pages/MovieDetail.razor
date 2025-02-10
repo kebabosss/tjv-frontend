@@ -30,7 +30,6 @@
                     <PropertyColumn Property="x => x.yearOfBirth" Title="Rok narození" Sortable="true"/>
                     <TemplateColumn CellClass="justify-center" Title="Odebrat režiséra">
                         <CellTemplate>
-                            @* <MudIconButton Icon="@Icons.Material.Outlined.RemoveRedEye" Color="Color.Info" Size="Size.Small" OnClick="() => ViewDetailDirector(context.Item.id)"></MudIconButton>*@
                             <MudIconButton Icon="@Icons.Material.Outlined.RemoveCircleOutline" Color="Color.Error" Size="Size.Small" OnClick="() => RemoveDirector(context.Item.id)"></MudIconButton>
                         </CellTemplate>
                     </TemplateColumn>
@@ -38,12 +37,14 @@
             </MudDataGrid>
         </MudContainer>
         <MudContainer MaxWidth="MaxWidth.Large" Style="position: relative; padding: 3% 0 3%;" hidden="@(!_directorAdd)">
-            <MudForm @ref="_formDirector" @bind-IsValid="@_validDirector" ValidationDelay="0" SuppressImplicitSubmission="false">
-                <MudTextField @bind-Value="dirName" Label="Jméno" Variant="Variant.Outlined" Required="true"
-                              HelperTextOnFocus="true"/>
-                <MudNumericField @bind-Value="dirBorn" Min="1826" Max="@(DateTime.Now.Year)" Label="Rok narození" Variant="Variant.Outlined" Required="true"
-                                 HelperTextOnFocus="true"/>
-            </MudForm>
+            <MudPaper Style="padding: 2%">
+                <MudForm @ref="_formDirector" @bind-IsValid="@_validDirector" ValidationDelay="0" SuppressImplicitSubmission="false">
+                    <MudTextField @bind-Value="dirName" Label="Jméno" Variant="Variant.Outlined" Required="true"
+                                  HelperTextOnFocus="true"/>
+                    <MudNumericField @bind-Value="dirBorn" Min="1826" Max="@(DateTime.Now.Year)" Label="Rok narození" Variant="Variant.Outlined" Required="true"
+                                     HelperTextOnFocus="true"/>
+                </MudForm>
+            </MudPaper>
         </MudContainer>
     </MudContainer>
     <MudContainer Style="padding-left: 0; padding-right: 0 ; padding-top: 1%">
@@ -57,12 +58,8 @@
                        Class="add-item-btn">
                 Smazat
             </MudButton>
-            <MudButton OnClick="@CancelClicked" Color="@Color.Default" Variant="Variant.Outlined" Size="Size.Large"
-                       Class="add-item-btn">
-                Zahodit změny
-            </MudButton>
             <MudButton OnClick="@SaveClicked" Color="@Color.Success" Variant="Variant.Filled" Size="Size.Large"
-                       Class="add-item-btn"  Disabled="@(!_valid || (_directorAdd && !_validDirector))">
+                       Class="add-item-btn" Disabled="@(!_valid || (_directorAdd && !_validDirector))">
                 Uložit
             </MudButton>
         </MudStack>
@@ -231,19 +228,56 @@
 
         if (result?.Data as bool? == true)
         {
-            Snackbar.Add("Smazání filmu proběhlo úspěšně", Severity.Success);
-            GoBackClicked();
-            return;
+            var response = await Http.DeleteAsync($"/rest/movie/{_changedObject.id}");
+
+            if (response.IsSuccessStatusCode)
+            {
+                GoBackClicked();
+                Snackbar.Add("Smazání filmu bylo úspěšné", Severity.Success);
+            }
+            else
+            {
+                Snackbar.Add($"Smazaní filmu vrátilo chybu: {response.StatusCode}", Severity.Error);
+            }
         }
-
-
-        Snackbar.Add("Smazání filmu se nezdařilo", Severity.Error);
-        Snackbar.Add("Smazání filmu se nezdařilo", Severity.Error);
     }
 
-    public void RemoveDirector(long directorId)
+    public async Task RemoveDirector(long directorId)
     {
-        
+        if (_directorData.Count == 1)
+        {
+            Snackbar.Add($"Odebrání posledního režiséra není možné", Severity.Error);
+            return;
+        }
+        var parameters = new DialogParameters
+        {
+            { "ContentText", "Potvrdit odebrání režiséra z toho snímku. Odebráním se současně uloží i ostatní změny" },
+            { "ButtonText", "Odebrat" },
+            { "Color", Color.Error }
+        };
+
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
+
+        var result = await DialogService.Show<Dialog>("Potvrdit", parameters, options).Result;
+
+        if (result?.Data as bool? == true)
+        {
+            _changedObject.directors.Remove(directorId);
+
+            var response = await Http.PutAsJsonAsync($"rest/movie/{_changedObject.id}", _changedObject);
+
+            if (response.IsSuccessStatusCode)
+            {
+                Snackbar.Add("Odebrání režiséra bylo úspěšné", Severity.Success);
+            }
+            else
+            {
+                Snackbar.Add($"Odebrání režiséra vrátilo chybový kód: {response.StatusCode}", Severity.Error);
+            }
+
+            await GetDirectors();
+            StateHasChanged();
+        }
     }
 
     private void GoBackClicked()
@@ -255,10 +289,7 @@
     {
         Navigation.NavigateTo($"/reviewDetail/{movieId}");
     }
-
-    private void ViewDetailDirector(long directorId)
-    {
-    }
+    
 
     private async Task SaveClicked()
     {
@@ -280,6 +311,7 @@
                 await SaveDir();
                 _directorAdd = false;
             }
+
             var response = await Http.PutAsJsonAsync($"rest/movie/{_changedObject.id}", _changedObject);
 
             if (response.IsSuccessStatusCode)
@@ -294,25 +326,6 @@
             await GetDirectors();
             StateHasChanged();
         }
-    }
-
-    private async Task CancelClicked()
-    {
-        if (_form != null)
-        {
-            await _form.ResetAsync();
-        }
-        
-        if (_formDirector != null)
-        {
-            await _formDirector.ResetAsync();
-        }
-
-        dirBorn = 0;
-        dirName = "";
-        _directorAdd = false;
-        await RefreshList();
-        StateHasChanged();
     }
 
     private bool _loading = true;

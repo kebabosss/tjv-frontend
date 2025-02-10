@@ -1,0 +1,223 @@
+﻿@page "/MovieAdd"
+@using BlazorFrontend.DTO
+@inject NavigationManager Navigation
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
+@inject HttpClient Http
+
+
+<MudContainer MaxWidth="MaxWidth.Medium" Style="padding-top: 2%">
+    <MudPaper Style="padding: 2%">
+        <MudForm @ref="_form" @bind-IsValid="@_valid" ValidationDelay="0" SuppressImplicitSubmission="false">
+            <MudTextField @bind-Value="_newObject.name" Label="Jméno" Variant="Variant.Outlined" Required="true"
+                          HelperTextOnFocus="true"/>
+            <MudNumericField @bind-Value="_newObject.releaseYear" Min="1874" Max="@(DateTime.Now.Year)" Label="Rok vydání" Variant="Variant.Outlined" Required="true"
+                             HelperTextOnFocus="true"/>
+        </MudForm>
+    </MudPaper>
+    <MudContainer Style="padding-top: 1%; padding-right: 0; padding-left: 0">
+        <MudContainer MaxWidth="MaxWidth.Large" Style="position: relative; padding: 3% 0 3%;" hidden="@_directorAdd">
+            <MudDataGrid T="DirectorDTO" MultiSelection="false" Items="@_directorData" SortMode="SortMode.Multiple"
+                         Filterable="false"
+                         Hideable="false" Dense="true" Striped="true" ShowColumnOptions="false">
+                <ToolBarContent>
+                    <MudText Typo="Typo.h6">Režiséři</MudText>
+                    <MudSpacer/>
+                    <MudButton Variant="Variant.Outlined" Color="Color.Default" OnClick="@DirAddEnable">Přidat režiséra</MudButton>
+                </ToolBarContent>
+                <Columns>
+                    <PropertyColumn Property="x => x.name" Title="Jméno" Sortable="true"
+                                    InitialDirection="SortDirection.Ascending"/>
+                    <PropertyColumn Property="x => x.yearOfBirth" Title="Rok narození" Sortable="true"/>
+                    <TemplateColumn CellClass="justify-center" Title="režisér již existuje">
+                        <CellTemplate>
+                            @if (context.Item.id < 0)
+                            {
+                                 <MudIconButton Icon="@Icons.Material.Filled.Clear" Color="Color.Error" Size="Size.Small" />
+                            }
+                            else
+                            { 
+                                <MudIconButton Icon="@Icons.Material.Filled.Check" Color="Color.Success" Size="Size.Small" />
+                            }
+                        </CellTemplate>
+                    </TemplateColumn>
+                    <TemplateColumn CellClass="justify-center" Title="Odebrat režiséra">
+                        <CellTemplate>
+                            <MudIconButton Icon="@Icons.Material.Outlined.RemoveCircleOutline" Color="Color.Error" Size="Size.Small" OnClick="() => RemoveDirector(context.Item.id)"></MudIconButton>
+                        </CellTemplate>
+                    </TemplateColumn>
+                </Columns>
+            </MudDataGrid>
+        </MudContainer>
+        <MudContainer MaxWidth="MaxWidth.Large" Style="position: relative; padding: 3% 0 3%;" hidden="@(!_directorAdd)">
+            <MudPaper Style="padding: 2%">
+                <MudForm @ref="_formDirector" @bind-IsValid="@_validDirector" ValidationDelay="0" SuppressImplicitSubmission="false">
+                    <MudTextField @bind-Value="dirName" Label="Jméno" Variant="Variant.Outlined" Required="true"
+                                  HelperTextOnFocus="true"/>
+                    <MudNumericField @bind-Value="dirBorn" Min="1826" Max="@(DateTime.Now.Year)" Label="Rok narození" Variant="Variant.Outlined" Required="true"
+                                     HelperTextOnFocus="true"/>
+                </MudForm>
+            </MudPaper>
+        </MudContainer>
+    </MudContainer>
+    <MudContainer Style="padding-left: 0; padding-right: 0 ; padding-top: 1%">
+        <MudStack Row="true" Justify="Justify.FlexEnd">
+            <MudSpacer></MudSpacer>
+            <MudButton OnClick="@AddDirector" Color="@Color.Success" Variant="Variant.Filled" Size="Size.Large"
+                       Class="add-item-btn" hidden="@(!_directorAdd)" Disabled="@(!_validDirector)">
+                Přidat režiséra
+            </MudButton>
+            <MudButton OnClick="@CancelClicked" Color="@Color.Default" Variant="Variant.Outlined" Size="Size.Large"
+                       Class="add-item-btn">
+                Zrušit
+            </MudButton>
+            <MudButton OnClick="@SaveClicked" Color="@Color.Success" Variant="Variant.Filled" Size="Size.Large"
+                       Class="add-item-btn" Disabled="@(!_valid || (_directorAdd && !_validDirector) || _newObject.directors.Count == 0)">
+                Uložit
+            </MudButton>
+        </MudStack>
+    </MudContainer>
+</MudContainer>
+
+@code
+{
+    /// <summary>
+    ///  ID of the document.
+    /// </summary>
+    [Parameter]
+    public long Id { get; set; }
+
+    
+    private bool _directorAdd = true;
+    private long newIds = -1;
+    private bool _valid = true;
+    private bool _validDirector;
+    private string dirName;
+    private int dirBorn;
+    private MudForm? _form;
+    private MudForm? _formDirector;
+    private List<DirectorDTO> _directorData = new List<DirectorDTO>();
+    private MovieDTO _newObject = new();
+
+
+    /// <summary>
+    /// Initializes the component.
+    /// </summary>
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+    }
+
+    private void GoBackClicked()
+    {
+        Navigation.NavigateTo($"/movieList");
+    }
+
+    public void DirAddEnable()
+    {
+        _directorAdd = true;
+    }
+    
+
+    public async Task AddDirector()
+    {
+        var result = await Http.GetFromJsonAsync<List<DirectorDTO>>($"/rest/director/director?name={dirName}&year={dirBorn}");
+        if (result != null)
+        {
+            if (result.Count != 0)
+            {
+                _newObject.directors.Add(result.First().id);
+                _directorData.Add(result.First());
+            }
+            else
+            {
+                DirectorDTO newDir = new DirectorDTO(newIds, [], dirName, dirBorn);
+                newIds -= 1;
+                _newObject.directors.Add(newDir.id);
+                _directorData.Add(newDir);
+            }
+        }
+
+        dirBorn = 0;
+        dirName = "";
+        await _formDirector.ResetAsync();
+        _directorAdd = false;
+        StateHasChanged();
+    }
+
+    public void RemoveDirector(long id)
+    {
+        _newObject.directors.Remove(id);
+        foreach (var directorDto in _directorData)
+        {
+            if (directorDto.id == id)
+            {
+                _directorData.Remove(directorDto);
+                break;
+            }
+        }
+        StateHasChanged();
+    }
+
+    private async Task CreateDirs()
+    {
+        foreach (var director in _directorData)
+        {
+            if (director.id < 0)
+            {
+                _newObject.directors.Remove(director.id);
+                var response = await Http.PostAsJsonAsync($"rest/director", director);
+                if (response.IsSuccessStatusCode)
+                {
+                    var createdDirector = await response.Content.ReadFromJsonAsync<DirectorDTO>();
+                    if (createdDirector != null)
+                    {
+                        _newObject.directors.Remove(director.id);
+                        _newObject.directors.Add(createdDirector.id);
+                    }
+                }
+                else
+                {
+                    throw new Exception("Zakládání režisérů selhalo");
+                }
+
+            }
+        }
+    }
+
+    private async Task SaveClicked()
+    {
+        var parameters = new DialogParameters
+        {
+            { "ContentText", "Potvrdit přidání nového filmu" },
+            { "ButtonText", "Uložit" },
+            { "Color", Color.Success }
+        };
+
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
+
+        var result = await DialogService.Show<Dialog>("Potvrdit", parameters, options).Result;
+
+        if (result?.Data as bool? == true)
+        {
+            await CreateDirs();
+            var response = await Http.PostAsJsonAsync($"rest/movie", _newObject);
+
+            if (response.IsSuccessStatusCode)
+            {
+                Snackbar.Add("Přidání filmu bylo úspěšné", Severity.Success);
+                GoBackClicked();
+            }
+            else
+            {
+                Snackbar.Add($"Přidání filmu vrátilo chybový kód: {response.StatusCode}", Severity.Error);
+            }
+        }
+    }
+
+    private void CancelClicked()
+    {
+        GoBackClicked();
+    }
+
+}

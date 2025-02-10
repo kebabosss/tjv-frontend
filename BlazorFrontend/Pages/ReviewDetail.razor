@@ -8,34 +8,24 @@
 
 <MudContainer MaxWidth="MaxWidth.Medium" Style="padding-top: 2%">
     <MudPaper Style="padding: 2%">
-        <MudForm @ref="_form" @bind-IsValid="@_valid" ValidationDelay="0" SuppressImplicitSubmission="false"
-                 ReadOnly="@(!_edit)">
-            <MudTextField @bind-Value="_changedObject.reviewText" Label="Text recenze" Variant="@_textFieldVariant" Required="false"
-                          HelperTextOnFocus="true" HelperText="@_helperText"/>
-            <MudRating @bind-SelectedValue="_changedObject.rating" ReadOnly="@(!_edit)"/>
+        <MudForm @ref="_form" @bind-IsValid="@_valid" ValidationDelay="0" SuppressImplicitSubmission="false">
+            <MudTextField @bind-Value="_changedObject.reviewText" Label="Text recenze" Variant="Variant.Outlined" Required="false"/>
+            <MudRating @bind-SelectedValue="_changedObject.rating"/>
         </MudForm>
     </MudPaper>
     <MudContainer Style="padding-left: 0; padding-right: 0 ; padding-top: 1%">
         <MudStack Row="true" Justify="Justify.FlexEnd">
             <MudSpacer></MudSpacer>
             <MudButton OnClick="@GoBackClicked" Color="@Color.Default" Variant="Variant.Outlined" Size="Size.Large"
-                       Class="add-item-btn" hidden="@(_edit)">
+                       Class="add-item-btn">
                 Zpět
             </MudButton>
             <MudButton OnClick="@DeleteClicked" Color="@Color.Error" Variant="Variant.Filled" Size="Size.Large"
-                       Class="add-item-btn" hidden="@(_edit)">
+                       Class="add-item-btn">
                 Smazat
             </MudButton>
-            <MudButton OnClick="@EditClicked" Color="@Color.Default" Variant="Variant.Outlined" Size="Size.Large"
-                       Class="add-item-btn" hidden="@(_edit)">
-                Upravit
-            </MudButton>
-            <MudButton OnClick="@CancelClicked" Color="@Color.Default" Variant="Variant.Outlined" Size="Size.Large"
-                       Class="add-item-btn" hidden="@(!_edit)">
-                Zrušit
-            </MudButton>
             <MudButton OnClick="@SaveClicked" Color="@Color.Success" Variant="Variant.Filled" Size="Size.Large"
-                       Class="add-item-btn" hidden="@(!_edit)" Disabled="@(!_valid)">
+                       Class="add-item-btn" Disabled="@(!_valid)">
                 Uložit
             </MudButton>
         </MudStack>
@@ -50,10 +40,7 @@
     [Parameter]
     public long Id { get; set; }
 
-    private bool _edit;
     private bool _valid = true;
-    private Variant _textFieldVariant = Variant.Filled;
-    private string _helperText = "Tato hodnota je pouze pro čtení";
     private MudForm? _form;
     private ReviewDTO _changedObject = new();
 
@@ -95,7 +82,6 @@
 
         if (result?.Data as bool? == true)
         {
-            EditClicked();
             var response = await Http.DeleteAsync($"/rest/review/{_changedObject.reviewId}");
 
             if (response.IsSuccessStatusCode)
@@ -108,13 +94,6 @@
                 Snackbar.Add($"Smazaní recenze vrátilo chybu: {response.StatusCode}", Severity.Error);
             }
         }
-    }
-
-    private void EditClicked()
-    {
-        _edit = !_edit;
-        SwapHelperText();
-        SwapVariant();
     }
 
     private void GoBackClicked()
@@ -138,7 +117,6 @@
 
         if (result?.Data as bool? == true)
         {
-            EditClicked();
             var response = await Http.PutAsJsonAsync($"/rest/review/{_changedObject.reviewId}", _changedObject);
 
             if (response.IsSuccessStatusCode)
@@ -151,41 +129,4 @@
             }
         }
     }
-
-    private async Task CancelClicked()
-    {
-        EditClicked();
-        if (_form != null)
-        {
-            await _form.ResetAsync();
-        }
-
-        await RefreshList();
-        StateHasChanged();
-    }
-
-    private void SwapVariant()
-    {
-        if (_textFieldVariant == Variant.Filled)
-        {
-            _textFieldVariant = Variant.Outlined;
-        }
-        else
-        {
-            _textFieldVariant = Variant.Filled;
-        }
-    }
-
-    private void SwapHelperText()
-    {
-        if (_helperText == "")
-        {
-            _helperText = "Tato hodnota je pouze pro čtení";
-        }
-        else
-        {
-            _helperText = "";
-        }
-    }
-
 }
