@@ -17,12 +17,12 @@
     <MudContainer Style="padding-top: 1%; padding-right: 0; padding-left: 0">
         <MudContainer MaxWidth="MaxWidth.Large" Style="position: relative; padding: 3% 0 3%;" hidden="@_directorAdd">
             <MudDataGrid T="DirectorDTO" MultiSelection="false" Items="@_directorData" SortMode="SortMode.Multiple"
-                         Filterable="false"
+                         Filterable="false" Hover="true"
                          Hideable="false" Dense="true" Striped="true" ShowColumnOptions="false" Loading="@_loading">
                 <ToolBarContent>
                     <MudText Typo="Typo.h6">Režiséři</MudText>
                     <MudSpacer/>
-                    <MudButton Variant="Variant.Outlined" Color="Color.Default" OnClick="@AddDirector">Přidat režiséra</MudButton>
+                    <MudButton Variant="Variant.Outlined" Color="Color.Default" OnClick="@AddDirectorEnable">Přidat režiséra</MudButton>
                 </ToolBarContent>
                 <Columns>
                     <PropertyColumn Property="x => x.name" Title="Jméno" Sortable="true"
@@ -30,7 +30,7 @@
                     <PropertyColumn Property="x => x.yearOfBirth" Title="Rok narození" Sortable="true"/>
                     <TemplateColumn CellClass="justify-center" Title="Odebrat režiséra">
                         <CellTemplate>
-                            <MudIconButton Icon="@Icons.Material.Outlined.RemoveCircleOutline" Color="Color.Error" Size="Size.Small" OnClick="() => RemoveDirector(context.Item.id)"></MudIconButton>
+                            <MudIconButton Icon="@Icons.Material.Outlined.RemoveCircleOutline" Color="Color.Error" Size="Size.Small" OnClick="() => RemoveDirector(context.Item)"></MudIconButton>
                         </CellTemplate>
                     </TemplateColumn>
                 </Columns>
@@ -55,12 +55,20 @@
                 Zpět
             </MudButton>
             <MudButton OnClick="@DeleteClicked" Color="@Color.Error" Variant="Variant.Filled" Size="Size.Large"
-                       Class="add-item-btn">
+                       Class="add-item-btn" hidden="@_directorAdd">
                 Smazat
             </MudButton>
             <MudButton OnClick="@SaveClicked" Color="@Color.Success" Variant="Variant.Filled" Size="Size.Large"
-                       Class="add-item-btn" Disabled="@(!_valid || (_directorAdd && !_validDirector))">
+                       Class="add-item-btn" hidden="@_directorAdd" Disabled="@(!_valid)">
                 Uložit
+            </MudButton>
+            <MudButton OnClick="@CancelClicked" Color="@Color.Default" Variant="Variant.Outlined" Size="Size.Large"
+                       Class="add-item-btn" hidden="@(!_directorAdd)">
+                Zrušit
+            </MudButton>
+            <MudButton OnClick="@AddDir" Color="@Color.Success" Variant="Variant.Filled" Size="Size.Large"
+                       Class="add-item-btn" Disabled="@(!_validDirector)" hidden="@(!_directorAdd)">
+                Přidat
             </MudButton>
         </MudStack>
     </MudContainer>
@@ -72,7 +80,7 @@
                 </MudStack>
             </MudContainer>
             <MudDataGrid T="ReviewDTO" MultiSelection="false" Items="@_reviewData" SortMode="SortMode.Multiple"
-                         Filterable="false" QuickFilter="@QuickFilter"
+                         Filterable="false" QuickFilter="@QuickFilter" Hover="true"
                          Hideable="false" Dense="true" Striped="true" ShowColumnOptions="false" Loading="@_loading">
                 <ToolBarContent>
                     <MudText Typo="Typo.h6">Recenze</MudText>
@@ -158,13 +166,18 @@
         StateHasChanged();
     }
 
-    public void AddDirector()
+    public void AddDirectorEnable()
     {
         _directorAdd = true;
     }
 
-    public async Task SaveDir()
+    public async Task AddDir()
     {
+        if (dirBorn > _changedObject.releaseYear)
+        {
+            Snackbar.Add("Film nemůže být starší než režisér", Severity.Error);
+            return;
+        }
         var result = await Http.GetFromJsonAsync<List<DirectorDTO>>($"/rest/director/director?name={dirName}&year={dirBorn}");
         if (result != null)
         {
@@ -176,13 +189,20 @@
             {
                 Snackbar.Add("Režisér byl úspěšně nalezen", Severity.Success);
                 _changedObject.directors.Add(result.First().id);
+                _directorData.Add(result.First());
             }
         }
 
+        await CancelClicked();
+    }
+
+    private async Task CancelClicked()
+    {
         dirBorn = 0;
         dirName = "";
         await _formDirector.ResetAsync();
         _directorAdd = false;
+        StateHasChanged();
     }
 
     private async Task GetReviews()
@@ -242,42 +262,18 @@
         }
     }
 
-    public async Task RemoveDirector(long directorId)
+    public async Task RemoveDirector(DirectorDTO director)
     {
         if (_directorData.Count == 1)
         {
             Snackbar.Add($"Odebrání posledního režiséra není možné", Severity.Error);
             return;
         }
-        var parameters = new DialogParameters
-        {
-            { "ContentText", "Potvrdit odebrání režiséra z toho snímku. Odebráním se současně uloží i ostatní změny" },
-            { "ButtonText", "Odebrat" },
-            { "Color", Color.Error }
-        };
 
-        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
-
-        var result = await DialogService.Show<Dialog>("Potvrdit", parameters, options).Result;
-
-        if (result?.Data as bool? == true)
-        {
-            _changedObject.directors.Remove(directorId);
-
-            var response = await Http.PutAsJsonAsync($"rest/movie/{_changedObject.id}", _changedObject);
-
-            if (response.IsSuccessStatusCode)
-            {
-                Snackbar.Add("Odebrání režiséra bylo úspěšné", Severity.Success);
-            }
-            else
-            {
-                Snackbar.Add($"Odebrání režiséra vrátilo chybový kód: {response.StatusCode}", Severity.Error);
-            }
-
-            await GetDirectors();
-            StateHasChanged();
-        }
+        await _form.Validate();
+        _changedObject.directors.Remove(director.id);
+        _directorData.Remove(director);
+        StateHasChanged();
     }
 
     private void GoBackClicked()
@@ -306,12 +302,15 @@
 
         if (result?.Data as bool? == true)
         {
-            if (_directorAdd)
+            foreach (var directorDto in _directorData)
             {
-                await SaveDir();
-                _directorAdd = false;
+                if (directorDto.yearOfBirth > _changedObject.releaseYear)
+                {
+                    Snackbar.Add("Film nemůže být starší než režisér", Severity.Error);
+                    return;
+                }
             }
-
+            
             var response = await Http.PutAsJsonAsync($"rest/movie/{_changedObject.id}", _changedObject);
 
             if (response.IsSuccessStatusCode)

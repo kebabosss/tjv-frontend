@@ -19,7 +19,7 @@
     <MudContainer Style="padding-top: 1%; padding-right: 0; padding-left: 0">
         <MudContainer MaxWidth="MaxWidth.Large" Style="position: relative; padding: 3% 0 3%;" hidden="@_directorAdd">
             <MudDataGrid T="DirectorDTO" MultiSelection="false" Items="@_directorData" SortMode="SortMode.Multiple"
-                         Filterable="false"
+                         Filterable="false" Hover="true"
                          Hideable="false" Dense="true" Striped="true" ShowColumnOptions="false">
                 <ToolBarContent>
                     <MudText Typo="Typo.h6">Režiséři</MudText>
@@ -66,7 +66,7 @@
             <MudSpacer></MudSpacer>
             <MudButton OnClick="@AddDirector" Color="@Color.Success" Variant="Variant.Filled" Size="Size.Large"
                        Class="add-item-btn" hidden="@(!_directorAdd)" Disabled="@(!_validDirector)">
-                Přidat režiséra
+                Přidat
             </MudButton>
             <MudButton OnClick="@CancelClicked" Color="@Color.Default" Variant="Variant.Outlined" Size="Size.Large"
                        Class="add-item-btn">
@@ -122,6 +122,11 @@
 
     public async Task AddDirector()
     {
+        if (dirBorn > _newObject.releaseYear)
+        {
+            Snackbar.Add("Film nemůže být starší než režisér", Severity.Error);
+            return;
+        }
         var result = await Http.GetFromJsonAsync<List<DirectorDTO>>($"/rest/director/director?name={dirName}&year={dirBorn}");
         if (result != null)
         {
@@ -201,6 +206,23 @@
 
         if (result?.Data as bool? == true)
         {
+            foreach (var directorDto in _directorData)
+            {
+                if (directorDto.yearOfBirth > _newObject.releaseYear)
+                {
+                    Snackbar.Add("Film nemůže být starší než režisér", Severity.Error);
+                    return;
+                }
+            }
+            var testResult = await Http.GetFromJsonAsync<List<MovieDTO>>($"/rest/movie/movie?name={_newObject.name}&year={_newObject.releaseYear}");
+            if (testResult != null)
+            {
+                if (testResult.Any())
+                {
+                    Snackbar.Add($"Film musí mít uninkátní název a rok vydání", Severity.Error);
+                    return;
+                }
+            }
             await CreateDirs();
             var response = await Http.PostAsJsonAsync($"rest/movie", _newObject);
 

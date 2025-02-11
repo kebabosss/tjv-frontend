@@ -16,16 +16,60 @@
                              HelperTextOnFocus="true"/>
         </MudForm>
     </MudPaper>
+    <MudContainer Style="padding-top: 1%; padding-right: 0; padding-left: 0">
+        <MudContainer MaxWidth="MaxWidth.Large" Style="position: relative; padding: 3% 0 3%;" hidden="@_movieAdd">
+            <MudDataGrid T="MovieDTO" MultiSelection="false" Items="@_movieData" SortMode="SortMode.Multiple"
+                         Filterable="false" Hover="true"
+                         Hideable="false" Dense="true" Striped="true" ShowColumnOptions="false">
+                <ToolBarContent>
+                    <MudText Typo="Typo.h6">Filmy</MudText>
+                    <MudSpacer/>
+                    <MudButton Variant="Variant.Outlined" Color="Color.Default" OnClick="@AddMovieEnable">Přidat film</MudButton>
+                </ToolBarContent>
+                <Columns>
+                    <PropertyColumn Property="x => x.name" Title="Název" Sortable="true"
+                                    InitialDirection="SortDirection.Ascending"/>
+                    <PropertyColumn Property="x => x.releaseYear" Title="Rok narození" Sortable="true"/>
+                    <TemplateColumn CellClass="justify-center" Title="Odebrat film">
+                        <CellTemplate>
+                            <MudIconButton Icon="@Icons.Material.Outlined.RemoveCircleOutline" Color="Color.Error" Size="Size.Small" OnClick="() => RemoveMovie(context.Item)"></MudIconButton>
+                        </CellTemplate>
+                    </TemplateColumn>
+                </Columns>
+                <PagerContent>
+                    <MudDataGridPager T="MovieDTO" RowsPerPageString="Položek na stránku: "/>
+                </PagerContent>
+            </MudDataGrid>
+        </MudContainer>
+        <MudContainer MaxWidth="MaxWidth.Large" Style="position: relative; padding: 3% 0 3%;" hidden="@(!_movieAdd)">
+            <MudPaper Style="padding: 2%">
+                <MudForm @ref="_formMovie" @bind-IsValid="@_validMovie" ValidationDelay="0" SuppressImplicitSubmission="false">
+                    <MudTextField @bind-Value="movieName" Label="Jméno" Variant="Variant.Outlined" Required="true"
+                                  HelperTextOnFocus="true"/>
+                    <MudNumericField @bind-Value="movieRelease" Min="1874" Max="@(DateTime.Now.Year)" Label="Rok vydání" Variant="Variant.Outlined" Required="true"
+                                     HelperTextOnFocus="true"/>
+                </MudForm>
+            </MudPaper>
+        </MudContainer>
+    </MudContainer>
     <MudContainer Style="padding-left: 0; padding-right: 0 ; padding-top: 1%">
         <MudStack Row="true" Justify="Justify.FlexEnd">
             <MudSpacer></MudSpacer>
-            <MudButton OnClick="@CancelClicked" Color="@Color.Default" Variant="Variant.Outlined" Size="Size.Large"
+            <MudButton OnClick="@GoBackClicked" Color="@Color.Default" Variant="Variant.Outlined" Size="Size.Large"
                        Class="add-item-btn">
-                Zrušit
+                Zpět
             </MudButton>
             <MudButton OnClick="@SaveClicked" Color="@Color.Success" Variant="Variant.Filled" Size="Size.Large"
-                       Class="add-item-btn" Disabled="@(!_valid)">
+                       Class="add-item-btn" Disabled="@(!_valid)" hidden="@_movieAdd">
                 Uložit
+            </MudButton>
+            <MudButton OnClick="@CancelClicked" Color="@Color.Default" Variant="Variant.Outlined" Size="Size.Large"
+                       Class="add-item-btn" hidden="@(!_movieAdd)">
+                Zrušit
+            </MudButton>
+            <MudButton OnClick="@AddMovie" Color="@Color.Success" Variant="Variant.Filled" Size="Size.Large"
+                       Class="add-item-btn" Disabled="@(!_valid)" hidden="@(!_movieAdd)">
+                Přidat
             </MudButton>
         </MudStack>
     </MudContainer>
@@ -39,8 +83,14 @@
     [Parameter]
     public long Id { get; set; }
 
+    private bool _movieAdd = false;
+    private List<MovieDTO> _movieData = new List<MovieDTO>();
     private bool _valid = true;
+    private bool _validMovie;
+    private string movieName;
+    private int movieRelease;
     private MudForm? _form;
+    private MudForm? _formMovie;
     private DirectorDTO _newObject = new();
 
 
@@ -56,8 +106,7 @@
     {
         Navigation.NavigateTo($"/directorList");
     }
-
-
+    
     private async Task SaveClicked()
     {
         var parameters = new DialogParameters
@@ -73,6 +122,14 @@
 
         if (result?.Data as bool? == true)
         {
+            foreach (var movieDto in _movieData)
+            {
+                if (movieDto.releaseYear < _newObject.yearOfBirth)
+                {
+                    Snackbar.Add("Film nemůže být starší než režisér", Severity.Error);
+                    return;
+                }
+            }
             var response = await Http.PostAsJsonAsync($"rest/director", _newObject);
 
             if (response.IsSuccessStatusCode)
@@ -91,10 +148,52 @@
             }
         }
     }
-
-    private void CancelClicked()
+    
+    
+    private async Task AddMovieEnable()
     {
-        GoBackClicked();
+        await _form.Validate();
+        _movieAdd = true;
+    }
+
+    private async Task AddMovie()
+    {
+        if (movieRelease < _newObject.yearOfBirth)
+        {
+            Snackbar.Add("Film nemůže být starší než režisér", Severity.Error);
+            return;
+        }
+        var result = await Http.GetFromJsonAsync<List<MovieDTO>>($"/rest/movie/movie?name={movieName}&year={movieRelease}");
+        if (result != null)
+        {
+            if (result.Count == 0)
+            {
+                Snackbar.Add("Zadaný film nebyl nalezen", Severity.Error);
+            }
+            else
+            {
+                Snackbar.Add("Film byl úspěšně nalezen", Severity.Success);
+                _newObject.moviesDirected.Add(result.First().id);
+                _movieData.Add(result.First());
+            }
+        }
+        await CancelClicked();
+    }
+
+    private async Task CancelClicked()
+    {
+        movieRelease = 0;
+        movieName = "";
+        await _formMovie.ResetAsync();
+        _movieAdd = false;
+    }
+    
+    public async Task RemoveMovie(MovieDTO movie)
+    {
+        _newObject.moviesDirected.Remove(movie.id); 
+        _movieData.Remove(movie);
+        
+        StateHasChanged();
     }
 
 }

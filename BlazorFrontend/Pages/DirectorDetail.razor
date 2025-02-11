@@ -17,12 +17,12 @@
     <MudContainer Style="padding-top: 1%; padding-right: 0; padding-left: 0">
         <MudContainer MaxWidth="MaxWidth.Large" Style="position: relative; padding: 3% 0 3%;" hidden="@_movieAdd">
             <MudDataGrid T="MovieDTO" MultiSelection="false" Items="@_movieData" SortMode="SortMode.Multiple"
-                         Filterable="false"
+                         Filterable="false" Hover="true"
                          Hideable="false" Dense="true" Striped="true" ShowColumnOptions="false">
                 <ToolBarContent>
                     <MudText Typo="Typo.h6">Filmy</MudText>
                     <MudSpacer/>
-                    <MudButton Variant="Variant.Outlined" Color="Color.Default" OnClick="@AddMovie">Přidat film</MudButton>
+                    <MudButton Variant="Variant.Outlined" Color="Color.Default" OnClick="@AddMovieEnable">Přidat film</MudButton>
                 </ToolBarContent>
                 <Columns>
                     <PropertyColumn Property="x => x.name" Title="Název" Sortable="true"
@@ -30,7 +30,7 @@
                     <PropertyColumn Property="x => x.releaseYear" Title="Rok narození" Sortable="true"/>
                     <TemplateColumn CellClass="justify-center" Title="Odebrat film">
                         <CellTemplate>
-                            <MudIconButton Icon="@Icons.Material.Outlined.RemoveCircleOutline" Color="Color.Error" Size="Size.Small" OnClick="() => RemoveMovie(context.Item.id)"></MudIconButton>
+                            <MudIconButton Icon="@Icons.Material.Outlined.RemoveCircleOutline" Color="Color.Error" Size="Size.Small" OnClick="() => RemoveMovie(context.Item)"></MudIconButton>
                         </CellTemplate>
                     </TemplateColumn>
                 </Columns>
@@ -58,12 +58,20 @@
                 Zpět
             </MudButton>
             <MudButton OnClick="@DeleteClicked" Color="@Color.Error" Variant="Variant.Filled" Size="Size.Large"
-                       Class="add-item-btn">
+                       Class="add-item-btn" hidden="@_movieAdd">
                 Smazat
             </MudButton>
             <MudButton OnClick="@SaveClicked" Color="@Color.Success" Variant="Variant.Filled" Size="Size.Large"
-                       Class="add-item-btn"  Disabled="@(!_valid)">
+                       Class="add-item-btn" hidden="@_movieAdd" Disabled="@(!_valid)">
                 Uložit
+            </MudButton>
+            <MudButton OnClick="@CancelClicked" Color="@Color.Default" Variant="Variant.Outlined" Size="Size.Large"
+                       Class="add-item-btn" hidden="@(!_movieAdd)">
+                Zrušit
+            </MudButton>
+            <MudButton OnClick="@AddMovie" Color="@Color.Success" Variant="Variant.Filled" Size="Size.Large"
+                       Class="add-item-btn" Disabled="@(!_validMovie)" hidden="@(!_movieAdd)">
+                Přidat
             </MudButton>
         </MudStack>
     </MudContainer>
@@ -149,7 +157,7 @@
     {
         var parameters = new DialogParameters
         {
-            { "ContentText", "Potvrdit uložení změn režiséra" },
+            { "ContentText", "Potvrdit uložení změn režiséra. Pokud odstraníte poslední režisérskou vazbu nějakého filmu, tak bude film také odstraněn" },
             { "ButtonText", "Uložit" },
             { "Color", Color.Success }
         };
@@ -160,9 +168,13 @@
 
         if (result?.Data as bool? == true)
         {
-            if (_movieAdd)
+            foreach (var movieDto in _movieData)
             {
-                await SaveMovie();
+                if (movieDto.releaseYear < _changedObject.yearOfBirth)
+                {
+                    Snackbar.Add("Film nemůže být starší než režisér", Severity.Error);
+                    return;
+                }
             }
             var response = await Http.PutAsJsonAsync($"/rest/director/{_changedObject.id}", _changedObject);
 
@@ -182,14 +194,19 @@
             await RefreshList();
         }
     }
-    private async Task AddMovie()
+    private async Task AddMovieEnable()
     {
         await _form.Validate();
         _movieAdd = true;
     }
 
-    private async Task SaveMovie()
+    private async Task AddMovie()
     {
+        if (movieRelease < _changedObject.yearOfBirth)
+        {
+            Snackbar.Add("Film nemůže být starší než režisér", Severity.Error);
+            return;
+        }
         var result = await Http.GetFromJsonAsync<List<MovieDTO>>($"/rest/movie/movie?name={movieName}&year={movieRelease}");
         if (result != null)
         {
@@ -201,9 +218,14 @@
             {
                 Snackbar.Add("Film byl úspěšně nalezen", Severity.Success);
                 _changedObject.moviesDirected.Add(result.First().id);
+                _movieData.Add(result.First());
             }
         }
+        await CancelClicked();
+    }
 
+    private async Task CancelClicked()
+    {
         movieRelease = 0;
         movieName = "";
         await _formMovie.ResetAsync();
@@ -222,36 +244,12 @@
         StateHasChanged();
     }
     
-    public async Task RemoveMovie(long movieId)
+    public async Task RemoveMovie(MovieDTO movie)
     {
-        var parameters = new DialogParameters
-        {
-            { "ContentText", "Potvrdit odebrání filmu z tvorby tohoto režiséra. Pokud se bude jednat o jediného režiséra nějakého snímku, tak snímek bude taky odstraněn" },
-            { "ButtonText", "Odebrat" },
-            { "Color", Color.Error }
-        };
-
-        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.ExtraSmall };
-
-        var result = await DialogService.Show<Dialog>("Potvrdit", parameters, options).Result;
-
-        if (result?.Data as bool? == true)
-        {
-            _changedObject.moviesDirected.Remove(movieId);
-
-            var response = await Http.PutAsJsonAsync($"rest/director/{_changedObject.id}", _changedObject);
-
-            if (response.IsSuccessStatusCode)
-            {
-                Snackbar.Add("Odebrání filmu bylo úspěšné", Severity.Success);
-            }
-            else
-            {
-                Snackbar.Add($"Odebrání filmu vrátilo chybový kód: {response.StatusCode}", Severity.Error);
-            }
-
-            await GetMovies();
-            StateHasChanged();
-        }
+        await _form.Validate();
+        _changedObject.moviesDirected.Remove(movie.id); 
+        _movieData.Remove(movie);
+        
+        StateHasChanged();
     }
 }
