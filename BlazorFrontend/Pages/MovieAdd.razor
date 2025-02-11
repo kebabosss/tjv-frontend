@@ -1,4 +1,5 @@
 ﻿@page "/MovieAdd"
+@using System.Net
 @using BlazorFrontend.DTO
 @inject NavigationManager Navigation
 @inject IDialogService DialogService
@@ -207,6 +208,10 @@
             {
                 Snackbar.Add("Přidání filmu bylo úspěšné", Severity.Success);
                 GoBackClicked();
+            }
+            else if (response.StatusCode == HttpStatusCode.Conflict)
+            {
+                Snackbar.Add($"Film musí mít uninkátní název a rok vydání", Severity.Error);
             }
             else
             {

@@ -318,12 +318,17 @@
             {
                 Snackbar.Add("Uložení změn bylo úspěšné", Severity.Success);
             }
+            else if (response.StatusCode == HttpStatusCode.Conflict)
+            {
+                Snackbar.Add($"Film musí mít unikátní název a rok vydání", Severity.Error);
+
+            }
             else
             {
                 Snackbar.Add($"Uložení vrátilo chybový kód: {response.StatusCode}", Severity.Error);
             }
 
-            await GetDirectors();
+            await RefreshList();
             StateHasChanged();
         }
     }
