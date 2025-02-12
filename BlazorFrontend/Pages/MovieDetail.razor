@@ -178,6 +178,14 @@
             Snackbar.Add("Film nemůže být starší než režisér", Severity.Error);
             return;
         }
+        foreach (var directorDto in _directorData)
+        {
+            if (dirBorn == directorDto.yearOfBirth && dirName == directorDto.name)
+            {
+                Snackbar.Add("Film už tohoto režiséra má", Severity.Error);
+                return;
+            }
+        }
         var result = await Http.GetFromJsonAsync<List<DirectorDTO>>($"/rest/director/director?name={dirName}&year={dirBorn}");
         if (result != null)
         {

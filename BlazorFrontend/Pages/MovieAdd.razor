@@ -64,17 +64,21 @@
     <MudContainer Style="padding-left: 0; padding-right: 0 ; padding-top: 1%">
         <MudStack Row="true" Justify="Justify.FlexEnd">
             <MudSpacer></MudSpacer>
+            <MudButton OnClick="@GoBackClicked" Color="@Color.Default" Variant="Variant.Outlined" Size="Size.Large"
+                       Class="add-item-btn">
+                Zpět
+            </MudButton>
+            <MudButton OnClick="@SaveClicked" Color="@Color.Success" Variant="Variant.Filled" Size="Size.Large"
+                       Class="add-item-btn" Disabled="@(!_valid || _newObject.directors.Count == 0)" hidden="@_directorAdd">
+                Uložit
+            </MudButton>
+            <MudButton OnClick="@CancelClicked" Color="@Color.Default" Variant="Variant.Outlined" Size="Size.Large"
+                       Class="add-item-btn" hidden="@(!_directorAdd)">
+                Zrušit
+            </MudButton>
             <MudButton OnClick="@AddDirector" Color="@Color.Success" Variant="Variant.Filled" Size="Size.Large"
                        Class="add-item-btn" hidden="@(!_directorAdd)" Disabled="@(!_validDirector)">
                 Přidat
-            </MudButton>
-            <MudButton OnClick="@CancelClicked" Color="@Color.Default" Variant="Variant.Outlined" Size="Size.Large"
-                       Class="add-item-btn">
-                Zrušit
-            </MudButton>
-            <MudButton OnClick="@SaveClicked" Color="@Color.Success" Variant="Variant.Filled" Size="Size.Large"
-                       Class="add-item-btn" Disabled="@(!_valid || (_directorAdd && !_validDirector) || _newObject.directors.Count == 0)">
-                Uložit
             </MudButton>
         </MudStack>
     </MudContainer>
@@ -127,6 +131,15 @@
             Snackbar.Add("Film nemůže být starší než režisér", Severity.Error);
             return;
         }
+
+        foreach (var directorDto in _directorData)
+        {
+            if (dirBorn == directorDto.yearOfBirth && dirName == directorDto.name)
+            {
+                Snackbar.Add("Film už tohoto režiséra má", Severity.Error);
+                return;
+            }
+        }
         var result = await Http.GetFromJsonAsync<List<DirectorDTO>>($"/rest/director/director?name={dirName}&year={dirBorn}");
         if (result != null)
         {
@@ -144,11 +157,7 @@
             }
         }
 
-        dirBorn = 0;
-        dirName = "";
-        await _formDirector.ResetAsync();
-        _directorAdd = false;
-        StateHasChanged();
+        await CancelClicked();
     }
 
     public void RemoveDirector(long id)
@@ -242,9 +251,13 @@
         }
     }
 
-    private void CancelClicked()
+    private async Task CancelClicked()
     {
-        GoBackClicked();
+        dirBorn = 0;
+        dirName = "";
+        await _formDirector.ResetAsync();
+        _directorAdd = false;
+        StateHasChanged();
     }
 
 }

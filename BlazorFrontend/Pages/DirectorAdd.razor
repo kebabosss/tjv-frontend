@@ -163,6 +163,14 @@
             Snackbar.Add("Film nemůže být starší než režisér", Severity.Error);
             return;
         }
+        foreach (var movieDto in _movieData)
+        {
+            if (movieRelease == movieDto.releaseYear && movieName == movieDto.name)
+            {
+                Snackbar.Add("Režisér již tento film má", Severity.Error);
+                return;
+            }
+        }
         var result = await Http.GetFromJsonAsync<List<MovieDTO>>($"/rest/movie/movie?name={movieName}&year={movieRelease}");
         if (result != null)
         {
